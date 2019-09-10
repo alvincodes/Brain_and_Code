@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>An overview of neuroimaging file formats - from the user’s perspective | Brain_and_Code</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="An overview of neuroimaging file formats - from the user’s perspective" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging." />
+<meta property="og:description" content="At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging." />
+<link rel="canonical" href="/2019/09/09/filetypes.html" />
+<meta property="og:url" content="/2019/09/09/filetypes.html" />
+<meta property="og:site_name" content="Brain_and_Code" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-09-09T00:00:00-04:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"/2019/09/09/filetypes.html"},"url":"/2019/09/09/filetypes.html","headline":"An overview of neuroimaging file formats - from the user’s perspective","dateModified":"2019-09-09T00:00:00-04:00","datePublished":"2019-09-09T00:00:00-04:00","description":"At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging.","@type":"BlogPosting","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Brain_and_Code" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Brain_and_Code</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">An overview of neuroimaging file formats - from the user&#39;s perspective</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-09-09T00:00:00-04:00" itemprop="datePublished">Sep 9, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging.</p>
+
+<p>My understanding of file formats and data storage in general expanded strongly when I had to manipulate files outside of the conventional processing software. That’s why I included some code snippets (<a href="https://github.com/NicoleEic/Brain_and_Code/tree/master/neuro_scripts/manipulate_files">code here</a>) at the end that demonstrate of how files can be manually loaded and changed.</p>
+
+<hr />
+<h1 id="volume-based-data">Volume-based data</h1>
+<h2 id="nifti">Nifti</h2>
+
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>a rectangular matrix of image intensities from data that is organized in voxels</li>
+      <li>typically 3D (3 spatial coordinates), but the 4th dimension can encode time in an fMRI scan</li>
+      <li>examples: a brain scan, manually drawn ROIs, diffusion tensors, a non-linear registration field</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Neuroimaging Informations Technology Initiative</li>
+    </ul>
+  </li>
+  <li>filename extension:
+    <ul>
+      <li>nii</li>
+      <li>nii.gz, if compressed</li>
+    </ul>
+  </li>
+  <li>
+    <p>General information
+  Nifti is by far the most commonly used file format to store volumetric brain imaging data and most processing softwares will support it. It originated from the ANALYZE 7.5 format and a Nifti file stores both the data matrix and a header that contains meta data. Due to the large file size, Nifti files are often stored compressed using gzip (nii.gz), which performs lossless compression based on the DEFLATE algorithm. There is a Nifti1 and a Nifti2 file format, but usually we don’t have to worry about that.</p>
+  </li>
+  <li>How can I display it?
+    <ul>
+      <li>There are various viewers available, just to name a few: Fsleyes, freeview, mango, wb_view, MRIcro, Brainstorm</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>In general, brainimaging softwares come with their own functions to perform analysis on Nifti files or perform basic manipulations</li>
+      <li>Processing softwares are, for example: FSL, SPM, AFNI, Freesurfer, DIPY</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>matlab: Niftiread</li>
+          <li>Python: nibabel Nifti module</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="dicom">Dicom</h2>
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>Raw brain scan data that comes directly from the MRI scanner</li>
+      <li>(raw means, here the data has been transformed from k-space to voxel space)</li>
+      <li>each 2D slice of the brain is stored in a separate file</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Digital Imaging and Communications in Medicine</li>
+    </ul>
+  </li>
+  <li>filename extension
+    <ul>
+      <li>usually: none (the file type is inferred by a characters in a specific location of the header)</li>
+      <li>sometimes: .dcm</li>
+    </ul>
+  </li>
+  <li>General Information
+    <ul>
+      <li>The DICOM format is widely used in medial imaging, not only for brain scans and has to serve many purposes</li>
+      <li>The file header can contain complex information that might not be needed for neuroimaging analysis</li>
+    </ul>
+  </li>
+  <li>How can I display it?
+    <ul>
+      <li>Many viewers from the medical context, but also Fsleyes, Mango, Brainstorm</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>Typically, you don’t want to manipulate a DICOM file directly</li>
+      <li>Conversion to Nifti for example with dcm2nii from MRIcro tool</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>MATLAB: dicomread</li>
+          <li>Python (limited support): pydicom, which is used as back-end for reading DICOMs in nibabel</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="mgh">mgh</h2>
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>see above for Nifti</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Massachusetts General Hospital</li>
+    </ul>
+  </li>
+  <li>
+    <p>filename extension
+  -mgh
+  -mgz (if compressed with ZLib)</p>
+  </li>
+  <li>General information:
+    <ul>
+      <li>The format is specifically used within the Freesurfer framework and has similar functionality and properties as the Nifti format</li>
+    </ul>
+  </li>
+  <li>How can I display it:
+    <ul>
+      <li>The native fiewer is freeview, but also fsleyes</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>Native processing tools are Freesurfer commands</li>
+      <li>convert to Nifti using the Freesurfer command mri_convert</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>MATLAB: MRIread</li>
+          <li>Python: nibabel, freesurfer.io</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="minc">minc</h2>
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>see above for Nifti</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Medical Image NetCDF</li>
+    </ul>
+  </li>
+  <li>
+    <p>filename extension
+  .mnc</p>
+  </li>
+  <li>General Information
+    <ul>
+      <li>The file format was developed at the MNI and it is designed to work with the the MINC processing toolbox and viewer</li>
+      <li>There is a MINC1 and a MINC2 file format</li>
+    </ul>
+  </li>
+  <li>How can I display it?
+    <ul>
+      <li>The native viewer is Display, but also: Fsleyes, freeview, Mango, Brainstorm, Register</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>Native processing tools is the Minc toolbox, but also Freesufer, AFNI</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>Matlab: loadminc</li>
+          <li>Python: nibabel, preliminary MINC2 support</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+<h1 id="suface-based-data">Suface-based data</h1>
+<h2 id="gifti">Gifti</h2>
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>surface-based data that is organized by vertices</li>
+      <li>can store Surface geometry and vertex-wise data</li>
+      <li>Nifti for surfaces</li>
+      <li>examples: a pial surface mesh, a surface map of cortical myelin, a manually drawn surface ROI</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Geometry Informatics Technology Initiative</li>
+    </ul>
+  </li>
+  <li>filename extension
+    <ul>
+      <li>.gii</li>
+      <li>two-part file extension depending on datatype
+        <ul>
+          <li>Surface geometry files (.surf.gii)</li>
+          <li>metric files (.func.gii, .shape.gii)</li>
+          <li>label files (.label.gii)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>General information
+    <ul>
+      <li>geometry data (surf.gii) represents a surface mesh. The files store the 3D coordinates and triangle arrays of a surface</li>
+      <li>Metric files (func.gii and shape.gii, there is no difference) store continuous values that are associated with the vertices. The data is a one-dimensional vector of intensities.</li>
+      <li>Label data (label.gii) stores integer values for each vertex together with a name and a colour</li>
+      <li>The file organization is based on the XML format</li>
+      <li>The format is widely used within the Human Connectome Project</li>
+    </ul>
+  </li>
+  <li>How can I display it?
+    <ul>
+      <li>wb_view, freeview, fsleyes, mango, Brainstorm</li>
+      <li>metric and label files need to be loaded together with a surf.gii file that defines the spatial configuration</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>wb command line tools, AFNI tools, FSL, Freesurfer</li>
+      <li>convert between file formats using mris_convert</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>Matlab: Gifti library</li>
+          <li>Python: nibabel Gifti module</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="cifti">Cifti</h2>
+<ul>
+  <li>What does it store:
+    <ul>
+      <li>data organized in ‘brainordinates’</li>
+      <li>elements are cortical surface vertices and subcortical voxels</li>
+      <li>example: dense connectome of cortical surface and subcortical structures</li>
+    </ul>
+  </li>
+  <li>Acronym:
+    <ul>
+      <li>Connectivity format of the Geometry Informatics Technology Initiative</li>
+    </ul>
+  </li>
+  <li>filename extension:
+    <ul>
+      <li>.nii (typically not compressed)</li>
+      <li>two-part file ending for different datatypes:
+        <ul>
+          <li>timeseries (dtseries.nii)</li>
+          <li>parcellation (dlabel.nii)</li>
+          <li>scalars (dscalar.nii)</li>
+          <li>connectivity (dconn.nii)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>General information
+    <ul>
+      <li>The Cifti format was designed to handle data from disjoint structures, such as cortex and subcortical structures, and large connectivity matrices</li>
+      <li>all relevant elements, i.e. all brainordinates could not be represented in a Nifti file alone</li>
+      <li>Cifti is based on the Nifti, but it can include both volumetric and surface data</li>
+      <li>The file organization is based on the XML format, which stores data arrays</li>
+      <li>in addition to the data array, we store the ‘mapping’, which interprets the element’s index, i.e. it assigns the ‘position’ of each element</li>
+      <li>mapping types can assign for examples parcels, or labels</li>
+    </ul>
+  </li>
+  <li>How can I display it?
+    <ul>
+      <li>wb_view, freeview</li>
+      <li>Cifti files need to be loaded together with a surf.gii file that defines the spatial configuration</li>
+    </ul>
+  </li>
+  <li>How can I manipulate it:
+    <ul>
+      <li>workbench command line tools, FSL</li>
+      <li>To read in for manual manipulation:
+        <ul>
+          <li>MATLB: Cifti-matlab toolbox</li>
+          <li>Python: nibabel: Cifti2 module</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<hr />
+<h1 id="miscellaneous-data">Miscellaneous data</h1>
+<hr />
+<h2 id="wb_view-specific">wb_view-specific:</h2>
+<ul>
+  <li>When working with files related to HCP data, you will encounter additional file types that have been customized for the wb_view software:</li>
+  <li>.scene and .spec files: organize which files are loaded an how they are displayed</li>
+  <li>.border, .foci, .annot: additional features on the brain surface</li>
+</ul>
+
+<h2 id="freesurfer-specific">Freesurfer-specific:</h2>
+<ul>
+  <li>some Freesurfer binary files have no filename extension and are only recognized by native commands</li>
+  <li>gca, bshort, bfloat, COR, surface, curv, w, annot, patch, gcs, dat, xfm, m3d and lta</li>
+</ul>
+
+<h2 id="json">json</h2>
+<ul>
+  <li>json files store attribute/value pairs, which can hold additional non-primary data such as parameters and timing information. Json files are recommended in the BIDS format to store meta information related to primary imaging and behavioural data files.</li>
+</ul>
+
+<hr />
+<h1 id="code-snippets">Code snippets</h1>
+<h2 id="manipulate-a-nifti-file">Manipulate a Nifti file</h2>
+<p>This is a basic example of how, to load, modify and save a Nifti-file using Python’s nibabel library. The file should like like this before and after the manipulation:
+<img src="/assets/filetypes1.png" alt="'example_brain.nii.gz'" height="200px" />
+<img src="/assets/filetypes2.png" alt="'example_brain_modified.nii.gz'" height="200px" /></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import numpy as np
+import nibabel as nib
+
+# load Nifti image
+img = nib.load('example_brain.nii.gz')
+# get data matrix
+img_data = img.get_data()
+# create copy of data matrix which you can modify
+new_data = img_data.copy()
+
+# fill one slice in the middle of the first axis (i.e. the mid-saggital slice) with random values
+mid_index = np.int(np.rint(new_data.shape[0]/2))
+new_data[mid_index, :, :] = np.random.rand(new_data.shape[1], new_data.shape[2])
+
+# create new image object with header information of original image
+new_img = nib.Nifti1Image(new_data, img.affine, img.header)
+# save file
+nib.save(new_img,'example_brain_modified.nii.gz')
+</code></pre></div></div>
+
+<h2 id="manipulate-a-border-file">Manipulate a border file</h2>
+<p>I didn’t include an example of how to manipulate a Gifti-file, because it works very similar as for the Nifti file. Modifying a wb_view border file, is more tricky, because it’s not supported by the nibabel library. In the example below I’m using the build-in python XML parser to load a border file to edit the colour associated with both the border class and the border name. Note that you can only display the border file together with geometric gifti file, in this case a sphere.</p>
+
+<p><img src="/assets/filetypes3.png" alt="'example_border.border'" height="200px" /></p>
+
+<p><img src="/assets/filetypes4.png" alt="'example_border_red.border'" height="200px" /></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import xml.etree.ElementTree as ET
+import numpy as np
+
+# read in border file using XML parser
+tree = ET.parse('example_border.border')
+root = tree.getroot()
+
+# access the top-level border_class and update colour
+border_class = root.getchildren()[0]
+border_class.set('Red','1')
+border_class.set('Green','0')
+border_class.set('Blue','0')
+
+# access the low-level border_name and update colour
+border_name = border_class.getchildren()[0]
+border_name.set('Red','1')
+border_name.set('Green','0')
+border_name.set('Blue','0')
+
+# save changes to new file
+tree.write('example_border_red.border')
+</code></pre></div></div>
+
+<hr />
+<h1 id="thats-it">That’s it!</h1>
+<p>Thanks for reading this post :-)</p>
+
+<p>Nicole</p>
+
+  </div><a class="u-url" href="/2019/09/09/filetypes.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Brain_and_Code</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Brain_and_Code</li><li><a class="u-email" href="mailto:n.eichert@googlemail.com">n.eichert@googlemail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/nicoleeic"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">nicoleeic</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Hi! Read this blog if you want to know my tips about data visualization and data analysis for neuroimaging and behavioural data. You will also find some tutorials and code snippets to improve you workflow in Python, bash, R and matlab coding.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

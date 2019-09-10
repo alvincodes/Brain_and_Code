@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Spin your head - manual rigid body transformations | Brain_and_Code</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Spin your head - manual rigid body transformations" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s1 FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!" />
+<meta property="og:description" content="Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s1 FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!" />
+<link rel="canonical" href="/2019/08/11/spin-your-head.html" />
+<meta property="og:url" content="/2019/08/11/spin-your-head.html" />
+<meta property="og:site_name" content="Brain_and_Code" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-11T00:00:00-04:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"/2019/08/11/spin-your-head.html"},"url":"/2019/08/11/spin-your-head.html","headline":"Spin your head - manual rigid body transformations","dateModified":"2019-08-11T00:00:00-04:00","datePublished":"2019-08-11T00:00:00-04:00","description":"Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s1 FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!","@type":"BlogPosting","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Brain_and_Code" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Brain_and_Code</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Spin your head - manual rigid body transformations</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-08-11T00:00:00-04:00" itemprop="datePublished">Aug 11, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s<sup>1</sup> FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!</p>
+
+<p>Here I’ll describe the theoretical background of this image manipulation, but you can find scripts that deals with it in my Github repository: <code class="highlighter-rouge">https://github.com/NicoleEic/projects/tree/master/neuro_scripts/manual_rigid_body</code>.</p>
+
+<h3 id="lets-get-started-with-some-basics-">Let’s get started with some basics …</h3>
+
+<p>The type of transformation that I’m talking about is a ‘rigid body’ transformation. This means that the image can be translated (i.e. shifted) along the dimensions in space or rotated along the three spatial axes, but it won’t be deformed in any way. The image below demonstrates how translation and rotation would look like in a 2D example. Such a rigid body transformation has 6 degrees of freedom (3 for translation, 3 for rotation). Note that a transformation with 12 degrees of freedom would allow you to scale and shear the image, and a nonlinear transformation will yield more complex deformations.</p>
+
+<p><img src="/assets/spin1.png" alt="'Translation and Rotation'" /></p>
+
+<p>Both the translation and the rotation operation can be represented as 4x4 matrix (<code class="highlighter-rouge">T</code> and <code class="highlighter-rouge">R</code>). Below with the code snippets, I provide a bit more mathematical background of how we can derive these matrices. When we combine translation and rotation into one matrix, we get an ‘affine’ matrix <code class="highlighter-rouge">M</code>: <code class="highlighter-rouge">M = T * R</code>. Note that the order of the steps matters: <code class="highlighter-rouge">T * R != R * T</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>translation matrix (T) : | 1, 0, 0, t_1 |
+                         | 0, 1, 0, t_2 |
+                         | 0, 0, 1, t_3 |
+                         | 0, 0, 0, 1 |
+
+rotation matrix (R): | r_11 r_21 r_31 0 |
+                     | r_12 r_22 r_32 0 |
+                     | r_13 r_23 r_33 0 |
+                     | 0    0    0    1 |
+
+affine matrix (M): | m_11 m_21 m_31 m_41 |
+                   | m_12 m_22 m_32 m_42 |
+                   | m_13 m_23 m_33 m_43 |
+                   | 0    0    0    1    |                     
+
+</code></pre></div></div>
+
+<p>A structural brain scan is essentially a 3D matrix that stores the image intensities, let’s call it <code class="highlighter-rouge">I</code>. Applying a transformation means that we are performing a matrix multiplication of the image matrix <code class="highlighter-rouge">I</code> and the transformation matrix <code class="highlighter-rouge">M</code> where the transformed output image is <code class="highlighter-rouge">I'</code>: <code class="highlighter-rouge">I' = I * M</code>.</p>
+
+<p>To get the rotation matrix, however, we have to wrap our head around a tricky topic, the coordinate system of the image. Typically, neuroimaging data comes with two coordinate systems that define ‘voxel space’ and ‘image space’. The origin of the voxel space is usually in the ‘left-posterior-inferior’ corner of your image. In image space, the origin is usually placed in the center of the brain. In FSL’s image viewer fsl_eyes, the coordinate for both spaces are displayed.</p>
+
+<p><img src="/assets/spin2.png" alt="'Coordinate systems'" /></p>
+
+<p>A matrix multiplication as defined above, performed for example by FSL’s ‘applywarp’, will assume that we are rotating around the origin of the voxel space, which is NOT what we want in image alignment. That’s why we first need to compensate for the ‘offset’ between the two coordinate systems. The information about this ‘offset’ is stored in the header of your scan within the ‘sform’ (or ‘qform’). The sform is an affine matrix, where the offset is represented in the last column (I recommend reading: <code class="highlighter-rouge">https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained</code>).</p>
+
+<p>That means we require 3 steps to rotate the brain image: 1) translate the image to the voxel space origin using the offset from sform, 2) apply a rotation based on desired angles, 3) translate the image back to the image space origin using the inverse of the offset.</p>
+
+<p><img src="/assets/spin3.png" alt="'Rotation matrix'" /></p>
+
+<p>Equipped with this theoretical knowledge, we can compose our desired rigid body transformation using a few simple code lines. Working through such a transformation manually helped me a lot to understand how neuroimaging data is stored and displayed and how it can be manipulated outside of the standard processing toolboxes. I hope I could make this topic accessible without going too deep in the maths and below I post some related python snippets.</p>
+
+<p>Thank you for reading this post :-)</p>
+
+<p>Nicole</p>
+
+<h1 id="code-snippets-and-more-details">Code snippets and more details</h1>
+
+<p>The following website provides useful comments on translation and rotation: <code class="highlighter-rouge">https://www.learnopencv.com/rotation-matrix-to-euler-angles/. </code></p>
+
+<h4 id="translation-matrix">Translation matrix</h4>
+<p>A translation can be represented as 3x1 vector or as 4x4 matrix. The conversion is straight forward:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># vector to matrix:
+translation_vec = np.array([x, y, z])
+T = np.array([[1, 0, 0, translation_vec[0]],
+              [0, 1, 0, translation_vec[1]],
+              [0, 0, 1, translation_vec[2]],
+              [0, 0, 0, 1]])
+
+# matrix to vector:
+translation_vec = T[0:3,3]
+
+</code></pre></div></div>
+
+<h4 id="rotation-matrix">Rotation matrix</h4>
+<p>A rotation can be described as 3x1 vector (theta) for the rotation along the three spatial axes. Each of the three rotation components can be described by a rotation matrix. The combined rotation matrix is derived as matrix multiplication of the three matrices:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+# vector to matrix:
+
+# define rotation vector in radians
+theta = np.array([th1, th2, th3])
+
+R_x = np.array([[ 1, 0,                  0                   ],
+                [ 0, math.cos(theta[0]), -math.sin(theta[0]) ],
+                [ 0, math.sin(theta[0]),  math.cos(theta[0]) ]])
+
+R_y = np.array([[  math.cos(theta[1]), 0, math.sin(theta[1])],
+                [  0,                  1,                  0],
+                [ -math.sin(theta[1]), 0, math.cos(theta[1])]])
+
+R_z = np.array([[ math.cos(theta[2]), -math.sin(theta[2]), 0],
+                [ math.sin(theta[2]),  math.cos(theta[2]), 0],
+                [ 0,               0,                      1]])
+
+R = np.dot(R_z, np.dot( R_y, R_x ))
+
+# add fourth column and row to convert 3x3 to 4x4 matrix:
+R = np.vstack((R,[0,0,0]))
+R = np.hstack((R, np.array([0,0,0,1]).reshape(-1,1)))
+
+
+# matrix to vector:
+# will only work with an invertible matrix
+sy = math.sqrt(R[0,0] * R[0,0] + R[1,0] * R[1,0])
+is_singular = sy &lt; 1e-4
+
+if not is_singular:
+    x = math.atan2(R[2,1], R[2,2])
+    y = math.atan2(-R[2,0], sy)
+    z = math.atan2(R[1,0], R[0,0])
+else:
+    x = math.atan2(-R[1,2], R[1,1])
+    y = math.atan2(-R[2,0], sy)
+    z = 0
+
+theta = np.array([x, y, z])
+</code></pre></div></div>
+
+<h4 id="compensate-for-offset">Compensate for offset</h4>
+
+<p>The following lines create a rotation matrix with adjusting for the offset of the coordinate system as described above:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import nibabel as nib
+import numpy as np
+
+# define desired rotation vector
+theta = np.array([th1, th2, th3])
+
+# load input image
+img = nib.load(filename)
+
+# determine sform
+aff = img.get_affine()
+
+# get offset from last column
+offset = aff[0:3,3]
+
+# convert theta to matrix (see above)
+R = angles_to_rotation_matrix(theta)
+
+# convert offset to matrix (see above)
+T = vector_to_translation_matrix(offset)
+
+# concatenate translation, rotation and inverse translation:
+M = np.dot(np.linalg.inv(T), np.dot(R,T))
+</code></pre></div></div>
+
+<h4 id="adjust-signs-in-offset">Adjust signs in offset</h4>
+<p>One last note on the offset of the coordinate system: Depending on the scanner settings the origin of your voxel space might be in a different ‘corner’ than the default (left-posterior-inferior). You can find out if this is the case by moving your cursor along the three spatial axis in your image viewer. You need to observe, if the values for the ‘voxel coordinates’ increase as expected from left to right, from posterior to anterior and from inferior to superior (sometimes called the default RAS+ orientation). If the values decrease instead, you can flip the sign using the following lines:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>flip_coordinates = [True False False]
+offset[flip_coordinates] = -offset[flip_coordinates]
+</code></pre></div></div>
+<p>Otherwise, the <code class="highlighter-rouge">nibabel</code> library has some useful tools like <code class="highlighter-rouge">nib.aff2axcodes</code> to automatically detect the axis orientations.</p>
+
+<h3 id="references">References</h3>
+<p><sup>1</sup> Jenkinson, M., Beckmann, C. F., Behrens, T. E. J., Woolrich, M. W. &amp; Smith, S. M. FSL. NeuroImage 62, 782–790 (2012).</p>
+
+  </div><a class="u-url" href="/2019/08/11/spin-your-head.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Brain_and_Code</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Brain_and_Code</li><li><a class="u-email" href="mailto:n.eichert@googlemail.com">n.eichert@googlemail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/nicoleeic"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">nicoleeic</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Hi! Read this blog if you want to know my tips about data visualization and data analysis for neuroimaging and behavioural data. You will also find some tutorials and code snippets to improve you workflow in Python, bash, R and matlab coding.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

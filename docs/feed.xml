@@ -1,0 +1,1647 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="/feed.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2019-09-10T15:44:17-04:00</updated><id>/feed.xml</id><title type="html">Brain_and_Code</title><subtitle>Hi! Read this blog if you want to know my tips about data visualization and data analysis for neuroimaging and behavioural data. You will also find some tutorials and code snippets to improve you workflow in Python, bash, R and matlab coding.</subtitle><entry><title type="html">An overview of neuroimaging file formats - from the user’s perspective</title><link href="/2019/09/09/filetypes.html" rel="alternate" type="text/html" title="An overview of neuroimaging file formats - from the user's perspective" /><published>2019-09-09T00:00:00-04:00</published><updated>2019-09-09T00:00:00-04:00</updated><id>/2019/09/09/filetypes</id><content type="html" xml:base="/2019/09/09/filetypes.html">&lt;p&gt;At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging.&lt;/p&gt;
+
+&lt;p&gt;My understanding of file formats and data storage in general expanded strongly when I had to manipulate files outside of the conventional processing software. That’s why I included some code snippets (&lt;a href=&quot;https://github.com/NicoleEic/Brain_and_Code/tree/master/neuro_scripts/manipulate_files&quot;&gt;code here&lt;/a&gt;) at the end that demonstrate of how files can be manually loaded and changed.&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;volume-based-data&quot;&gt;Volume-based data&lt;/h1&gt;
+&lt;h2 id=&quot;nifti&quot;&gt;Nifti&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;a rectangular matrix of image intensities from data that is organized in voxels&lt;/li&gt;
+      &lt;li&gt;typically 3D (3 spatial coordinates), but the 4th dimension can encode time in an fMRI scan&lt;/li&gt;
+      &lt;li&gt;examples: a brain scan, manually drawn ROIs, diffusion tensors, a non-linear registration field&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Neuroimaging Informations Technology Initiative&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;filename extension:
+    &lt;ul&gt;
+      &lt;li&gt;nii&lt;/li&gt;
+      &lt;li&gt;nii.gz, if compressed&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;General information
+  Nifti is by far the most commonly used file format to store volumetric brain imaging data and most processing softwares will support it. It originated from the ANALYZE 7.5 format and a Nifti file stores both the data matrix and a header that contains meta data. Due to the large file size, Nifti files are often stored compressed using gzip (nii.gz), which performs lossless compression based on the DEFLATE algorithm. There is a Nifti1 and a Nifti2 file format, but usually we don’t have to worry about that.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it?
+    &lt;ul&gt;
+      &lt;li&gt;There are various viewers available, just to name a few: Fsleyes, freeview, mango, wb_view, MRIcro, Brainstorm&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;In general, brainimaging softwares come with their own functions to perform analysis on Nifti files or perform basic manipulations&lt;/li&gt;
+      &lt;li&gt;Processing softwares are, for example: FSL, SPM, AFNI, Freesurfer, DIPY&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;matlab: Niftiread&lt;/li&gt;
+          &lt;li&gt;Python: nibabel Nifti module&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;dicom&quot;&gt;Dicom&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;Raw brain scan data that comes directly from the MRI scanner&lt;/li&gt;
+      &lt;li&gt;(raw means, here the data has been transformed from k-space to voxel space)&lt;/li&gt;
+      &lt;li&gt;each 2D slice of the brain is stored in a separate file&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Digital Imaging and Communications in Medicine&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;filename extension
+    &lt;ul&gt;
+      &lt;li&gt;usually: none (the file type is inferred by a characters in a specific location of the header)&lt;/li&gt;
+      &lt;li&gt;sometimes: .dcm&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;General Information
+    &lt;ul&gt;
+      &lt;li&gt;The DICOM format is widely used in medial imaging, not only for brain scans and has to serve many purposes&lt;/li&gt;
+      &lt;li&gt;The file header can contain complex information that might not be needed for neuroimaging analysis&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it?
+    &lt;ul&gt;
+      &lt;li&gt;Many viewers from the medical context, but also Fsleyes, Mango, Brainstorm&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;Typically, you don’t want to manipulate a DICOM file directly&lt;/li&gt;
+      &lt;li&gt;Conversion to Nifti for example with dcm2nii from MRIcro tool&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;MATLAB: dicomread&lt;/li&gt;
+          &lt;li&gt;Python (limited support): pydicom, which is used as back-end for reading DICOMs in nibabel&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;mgh&quot;&gt;mgh&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;see above for Nifti&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Massachusetts General Hospital&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;filename extension
+  -mgh
+  -mgz (if compressed with ZLib)&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;General information:
+    &lt;ul&gt;
+      &lt;li&gt;The format is specifically used within the Freesurfer framework and has similar functionality and properties as the Nifti format&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it:
+    &lt;ul&gt;
+      &lt;li&gt;The native fiewer is freeview, but also fsleyes&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;Native processing tools are Freesurfer commands&lt;/li&gt;
+      &lt;li&gt;convert to Nifti using the Freesurfer command mri_convert&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;MATLAB: MRIread&lt;/li&gt;
+          &lt;li&gt;Python: nibabel, freesurfer.io&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;minc&quot;&gt;minc&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;see above for Nifti&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Medical Image NetCDF&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;filename extension
+  .mnc&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;General Information
+    &lt;ul&gt;
+      &lt;li&gt;The file format was developed at the MNI and it is designed to work with the the MINC processing toolbox and viewer&lt;/li&gt;
+      &lt;li&gt;There is a MINC1 and a MINC2 file format&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it?
+    &lt;ul&gt;
+      &lt;li&gt;The native viewer is Display, but also: Fsleyes, freeview, Mango, Brainstorm, Register&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;Native processing tools is the Minc toolbox, but also Freesufer, AFNI&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;Matlab: loadminc&lt;/li&gt;
+          &lt;li&gt;Python: nibabel, preliminary MINC2 support&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;suface-based-data&quot;&gt;Suface-based data&lt;/h1&gt;
+&lt;h2 id=&quot;gifti&quot;&gt;Gifti&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;surface-based data that is organized by vertices&lt;/li&gt;
+      &lt;li&gt;can store Surface geometry and vertex-wise data&lt;/li&gt;
+      &lt;li&gt;Nifti for surfaces&lt;/li&gt;
+      &lt;li&gt;examples: a pial surface mesh, a surface map of cortical myelin, a manually drawn surface ROI&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Geometry Informatics Technology Initiative&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;filename extension
+    &lt;ul&gt;
+      &lt;li&gt;.gii&lt;/li&gt;
+      &lt;li&gt;two-part file extension depending on datatype
+        &lt;ul&gt;
+          &lt;li&gt;Surface geometry files (.surf.gii)&lt;/li&gt;
+          &lt;li&gt;metric files (.func.gii, .shape.gii)&lt;/li&gt;
+          &lt;li&gt;label files (.label.gii)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;General information
+    &lt;ul&gt;
+      &lt;li&gt;geometry data (surf.gii) represents a surface mesh. The files store the 3D coordinates and triangle arrays of a surface&lt;/li&gt;
+      &lt;li&gt;Metric files (func.gii and shape.gii, there is no difference) store continuous values that are associated with the vertices. The data is a one-dimensional vector of intensities.&lt;/li&gt;
+      &lt;li&gt;Label data (label.gii) stores integer values for each vertex together with a name and a colour&lt;/li&gt;
+      &lt;li&gt;The file organization is based on the XML format&lt;/li&gt;
+      &lt;li&gt;The format is widely used within the Human Connectome Project&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it?
+    &lt;ul&gt;
+      &lt;li&gt;wb_view, freeview, fsleyes, mango, Brainstorm&lt;/li&gt;
+      &lt;li&gt;metric and label files need to be loaded together with a surf.gii file that defines the spatial configuration&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;wb command line tools, AFNI tools, FSL, Freesurfer&lt;/li&gt;
+      &lt;li&gt;convert between file formats using mris_convert&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;Matlab: Gifti library&lt;/li&gt;
+          &lt;li&gt;Python: nibabel Gifti module&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;cifti&quot;&gt;Cifti&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;What does it store:
+    &lt;ul&gt;
+      &lt;li&gt;data organized in ‘brainordinates’&lt;/li&gt;
+      &lt;li&gt;elements are cortical surface vertices and subcortical voxels&lt;/li&gt;
+      &lt;li&gt;example: dense connectome of cortical surface and subcortical structures&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Acronym:
+    &lt;ul&gt;
+      &lt;li&gt;Connectivity format of the Geometry Informatics Technology Initiative&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;filename extension:
+    &lt;ul&gt;
+      &lt;li&gt;.nii (typically not compressed)&lt;/li&gt;
+      &lt;li&gt;two-part file ending for different datatypes:
+        &lt;ul&gt;
+          &lt;li&gt;timeseries (dtseries.nii)&lt;/li&gt;
+          &lt;li&gt;parcellation (dlabel.nii)&lt;/li&gt;
+          &lt;li&gt;scalars (dscalar.nii)&lt;/li&gt;
+          &lt;li&gt;connectivity (dconn.nii)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;General information
+    &lt;ul&gt;
+      &lt;li&gt;The Cifti format was designed to handle data from disjoint structures, such as cortex and subcortical structures, and large connectivity matrices&lt;/li&gt;
+      &lt;li&gt;all relevant elements, i.e. all brainordinates could not be represented in a Nifti file alone&lt;/li&gt;
+      &lt;li&gt;Cifti is based on the Nifti, but it can include both volumetric and surface data&lt;/li&gt;
+      &lt;li&gt;The file organization is based on the XML format, which stores data arrays&lt;/li&gt;
+      &lt;li&gt;in addition to the data array, we store the ‘mapping’, which interprets the element’s index, i.e. it assigns the ‘position’ of each element&lt;/li&gt;
+      &lt;li&gt;mapping types can assign for examples parcels, or labels&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I display it?
+    &lt;ul&gt;
+      &lt;li&gt;wb_view, freeview&lt;/li&gt;
+      &lt;li&gt;Cifti files need to be loaded together with a surf.gii file that defines the spatial configuration&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;How can I manipulate it:
+    &lt;ul&gt;
+      &lt;li&gt;workbench command line tools, FSL&lt;/li&gt;
+      &lt;li&gt;To read in for manual manipulation:
+        &lt;ul&gt;
+          &lt;li&gt;MATLB: Cifti-matlab toolbox&lt;/li&gt;
+          &lt;li&gt;Python: nibabel: Cifti2 module&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;miscellaneous-data&quot;&gt;Miscellaneous data&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;h2 id=&quot;wb_view-specific&quot;&gt;wb_view-specific:&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;When working with files related to HCP data, you will encounter additional file types that have been customized for the wb_view software:&lt;/li&gt;
+  &lt;li&gt;.scene and .spec files: organize which files are loaded an how they are displayed&lt;/li&gt;
+  &lt;li&gt;.border, .foci, .annot: additional features on the brain surface&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;freesurfer-specific&quot;&gt;Freesurfer-specific:&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;some Freesurfer binary files have no filename extension and are only recognized by native commands&lt;/li&gt;
+  &lt;li&gt;gca, bshort, bfloat, COR, surface, curv, w, annot, patch, gcs, dat, xfm, m3d and lta&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;json&quot;&gt;json&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;json files store attribute/value pairs, which can hold additional non-primary data such as parameters and timing information. Json files are recommended in the BIDS format to store meta information related to primary imaging and behavioural data files.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;code-snippets&quot;&gt;Code snippets&lt;/h1&gt;
+&lt;h2 id=&quot;manipulate-a-nifti-file&quot;&gt;Manipulate a Nifti file&lt;/h2&gt;
+&lt;p&gt;This is a basic example of how, to load, modify and save a Nifti-file using Python’s nibabel library. The file should like like this before and after the manipulation:
+&lt;img src=&quot;/assets/filetypes1.png&quot; alt=&quot;'example_brain.nii.gz'&quot; height=&quot;200px&quot; /&gt;
+&lt;img src=&quot;/assets/filetypes2.png&quot; alt=&quot;'example_brain_modified.nii.gz'&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np
+import nibabel as nib
+
+# load Nifti image
+img = nib.load('example_brain.nii.gz')
+# get data matrix
+img_data = img.get_data()
+# create copy of data matrix which you can modify
+new_data = img_data.copy()
+
+# fill one slice in the middle of the first axis (i.e. the mid-saggital slice) with random values
+mid_index = np.int(np.rint(new_data.shape[0]/2))
+new_data[mid_index, :, :] = np.random.rand(new_data.shape[1], new_data.shape[2])
+
+# create new image object with header information of original image
+new_img = nib.Nifti1Image(new_data, img.affine, img.header)
+# save file
+nib.save(new_img,'example_brain_modified.nii.gz')
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;manipulate-a-border-file&quot;&gt;Manipulate a border file&lt;/h2&gt;
+&lt;p&gt;I didn’t include an example of how to manipulate a Gifti-file, because it works very similar as for the Nifti file. Modifying a wb_view border file, is more tricky, because it’s not supported by the nibabel library. In the example below I’m using the build-in python XML parser to load a border file to edit the colour associated with both the border class and the border name. Note that you can only display the border file together with geometric gifti file, in this case a sphere.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/filetypes3.png&quot; alt=&quot;'example_border.border'&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/filetypes4.png&quot; alt=&quot;'example_border_red.border'&quot; height=&quot;200px&quot; /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import xml.etree.ElementTree as ET
+import numpy as np
+
+# read in border file using XML parser
+tree = ET.parse('example_border.border')
+root = tree.getroot()
+
+# access the top-level border_class and update colour
+border_class = root.getchildren()[0]
+border_class.set('Red','1')
+border_class.set('Green','0')
+border_class.set('Blue','0')
+
+# access the low-level border_name and update colour
+border_name = border_class.getchildren()[0]
+border_name.set('Red','1')
+border_name.set('Green','0')
+border_name.set('Blue','0')
+
+# save changes to new file
+tree.write('example_border_red.border')
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h1&gt;
+&lt;p&gt;Thanks for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;</content><author><name></name></author><summary type="html">At first, I found the plethora of file formats in neuroimaging quite overwhelming and with every processing software my confusion just seemed to increase exponentially. Despite the large number of resources online, I was missing a summary that describes the file formats in brevity but at the same time will answer the basic questions. I’m thinking of a typical user who doesn’t have a deep technical background in computer science, and who might already be stuck at the question: How can I actually open the file?’ (I’m exactly such a typical user). So I started to collect notes during my PhD, which I compiled here as a overview ‘from the user’s perspective’. Of course, this list is not exhaustive - and it might even be outdated soon - but it covers the most commonly used filetypes for MRI-based neuroimaging.</summary></entry><entry><title type="html">How to master an ANOVA: Examples in Python and R</title><link href="/2019/09/02/ANOVA.html" rel="alternate" type="text/html" title="How to master an ANOVA: Examples in Python and R" /><published>2019-09-02T00:00:00-04:00</published><updated>2019-09-02T00:00:00-04:00</updated><id>/2019/09/02/ANOVA</id><content type="html" xml:base="/2019/09/02/ANOVA.html">&lt;p&gt;In &lt;a href=&quot;https://nicoleeic.github.io/2019/09/01/Hypothesis_tests.html&quot;&gt;one of my previous blog posts&lt;/a&gt; I talked about how to pick the right statistical hypothesis test for your experimental design. One of the most heavily used family of tests for psychological and in general for experimental research is Analysis of Variance (ANOVA). Most analysis frameworks have build-in implementations for ANOVAs – with different strengths and limitations. But in order to set up and interpret your ANOVA correctly, it is necessary to understand it in the more general context of linear models and linear regression.&lt;/p&gt;
+
+&lt;p&gt;Here, I wrote a tutorial of how to conduct an ANOVA in Python and R and how to assess the underlying models matrices. Note that I didn’t include the assumption checks or post-hoc tests that you would typically want to do. Furthermore, the examples below include 3 and 4-factorial ANOVAs to demonstrate the underlying principles, but in practice you might want to break down your design. Such ‘big’ ANOVAs are not recommended, because they don’t account for the multiple tests involved. The code for the examples below can be found &lt;a href=&quot;https://github.com/NicoleEic/projects/tree/master/neuro_scripts/GLM_demo&quot;&gt;in my Github repository&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The imports that I used for all Python code below are the following:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import os
+import random
+import numpy as np
+import pandas as pd
+import patsy
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as smf
+import statsmodels.api as sm
+from statsmodels.stats.anova import AnovaRM
+from scipy import stats
+import seaborn as sns
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;1-way-anova-in-python-between-subject-factor&quot;&gt;1-way ANOVA in Python (between-subject factor)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;Let’s start with an example, where we are comparing an outcome measure in three different groups of subjects (healthy controls and two groups of patients, 10 subjects per group). Here, I’m simulating data with an effect of group and plot the data to inspect it.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# information on experimental design
+group_list = ['control','patient1','patient2']
+subs_list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+# read data into dataframe
+df_1way = pd.DataFrame(columns=[&quot;group&quot;, &quot;my_value&quot;])
+my_row = 0
+for ind_g, group in enumerate(group_list):
+    for sub in subs_list:
+        # generate random value here as example
+        my_val = np.random.normal(ind_g, 1, 1)[0]
+        df_1way.loc[my_row] = [group, my_val]
+        my_row = my_row + 1
+
+# inspect data
+sns.catplot(x=&quot;group&quot;, y=&quot;my_value&quot;, data=df_1way, dodge=True, kind='violin', aspect=3)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to conduct an ANOVA, we need to need to perform three steps: 1) Generate a model that fits our design, 2) Fit our data to the model to obtain the parameter estimates, 3) Derive the statistics using a summary function of the model fit. In Python, these steps are implemented in the &lt;code class=&quot;highlighter-rouge&quot;&gt;statsmodels&lt;/code&gt; library. The general function to perform a linear regression (which is underlying an ANOVA) is &lt;code class=&quot;highlighter-rouge&quot;&gt;ols&lt;/code&gt;. You can specify your model for &lt;code class=&quot;highlighter-rouge&quot;&gt;ols&lt;/code&gt; using the same formula syntax that is used in R. If you conduct a 1-way ANOVA, i.e. you only have one categorical factor in your design, you can also use the &lt;code class=&quot;highlighter-rouge&quot;&gt;f_oneway&lt;/code&gt; function. If you run the code below, you will see that they give an identical result&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# generate model for linear regression
+my_model = smf.ols(formula='my_value ~ group', data=df_1way)
+
+# fit model to data to obtain parameter estimates
+my_model_fit = my_model.fit()
+
+# print summary of linear regression
+print(my_model_fit.summary())
+
+# show anova table
+anova_table = sm.stats.anova_lm(my_model_fit, typ=2)
+print(anova_table)
+
+# compare p-value to f_oneway analysis
+F, p = stats.f_oneway(df_1way[df_1way['group'] == 'control'].my_value, df_1way[df_1way['group'] == 'patient1'].my_value, df_1way[df_1way['group'] == 'patient2'].my_value)
+print(p)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;2-way-anova-in-python-between-subject-factors&quot;&gt;2-way ANOVA in Python (between-subject factors)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;In the next example, we are extending our design to include native language of the subjects as additional factor. This means that we are still in a fully between-subject design and each data point comes from a different subject. The function call to &lt;code class=&quot;highlighter-rouge&quot;&gt;ols&lt;/code&gt; with the &lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt; operator will model both main effects for group and language and their interaction.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# information on experimental design
+group_list = ['control','patient1','patient2']
+language_list = ['English', 'German', 'French']
+subs_list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+
+# read data into dataframe
+df_2way = pd.DataFrame(columns=[&quot;group&quot;, &quot;language&quot;, &quot;my_value&quot;])
+my_row = 0
+for ind_g, group in enumerate(group_list):
+    for ind_l, lan in enumerate(language_list):
+        for sub in subs_list:
+                # generate random value here as example
+                my_val = np.random.normal(ind_g + ind_l, 1, 1)[0]
+                df_2way.loc[my_row] = [group, lan, my_val]
+                my_row = my_row + 1
+
+
+# plot data
+sns.catplot(x=&quot;language&quot;, y=&quot;my_value&quot;, data=df_2way, dodge=True, hue='group', kind='violin', aspect=3)
+plt.show()
+
+# fit model to data to obtain parameter estimates
+my_model_fit = smf.ols(formula='my_value ~ group * language', data=df_2way).fit()
+# print summary of linear regression
+print(my_model_fit.summary())
+# show anova table
+print(sm.stats.anova_lm(my_model_fit, typ=2))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;patsy&quot;&gt;Patsy&lt;/h2&gt;
+&lt;p&gt;At this point I would like to mention that &lt;code class=&quot;highlighter-rouge&quot;&gt;statsmodels&lt;/code&gt; internally uses the &lt;code class=&quot;highlighter-rouge&quot;&gt;patsy&lt;/code&gt; library to convert the specified formula to a model matrix. This is useful, because we can access and visualize the underlying model matrix. You can modify the design matrix, for example, to change the coding scheme for factorial categories from ‘treatment’ to ‘sum’ or use a different reference level.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# use Patsy to construct the model above
+model_matrix = patsy.dmatrix(&quot;group * language&quot;, df_2way)
+# visualize model
+plt.show(plt.imshow(model_matrix, aspect='auto'))
+# use sum coding scheme for factors
+plt.show(plt.imshow(patsy.dmatrix(&quot;C(group, Sum) * C(language, Sum)&quot;, df_2way), aspect='auto'))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;2-way-repeated-measures-anova-in-python-within-subject-factors&quot;&gt;2-way Repeated measures ANOVA in Python (within-subject factors)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;Let’s look at a different design, where we have repeated measures for each subject, which is common in psychological experiments. In this case we need to include random effects for each subject. We can conduct an ANOVA on such a design this using &lt;code class=&quot;highlighter-rouge&quot;&gt;mixedlm&lt;/code&gt;. In the examples here, we are modeling a random intercept for each subject, but by passing the ‘re_formula’ option, we can also include a random slope for each subject. If we only have a within-subject design, we can also use the &lt;code class=&quot;highlighter-rouge&quot;&gt;AnovaRM&lt;/code&gt; function in Python, however, only fully balanced within-subject designs are supported here. One general limitation for the Python implementations is that &lt;em&gt;crossed random-effects are not supported&lt;/em&gt;, so we can only specify one factor to model the random effects.&lt;/p&gt;
+
+&lt;p&gt;In the example below, I’m simulating data from a single-group design with two factors: All subjects performed three different tasks before and after a treatment. Note that in the data simulation, I’m introducing the factor sub_id which is unique for each subject and differs from the subject ID that we defined in the folder system (in combination with the ‘group’ string, the subject ID gives a unique identifier within the BIDS folder format).&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# information on experimental design
+subs_list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+task_list = ['task1', 'task2', 'task3']
+condition_list = ['pre', 'post']
+
+# read data into dataframe
+df_2way_rm = pd.DataFrame(columns=[&quot;sub_id&quot;, &quot;task&quot;, &quot;condition&quot;, &quot;my_value&quot;])
+my_row = 0
+# unique subject-ID as additional factor
+sub_id = 0
+for sub in subs_list:
+    sub_id = sub_id + 1
+    for ind_t, task in enumerate(task_list):
+        for ind_c, con in enumerate(condition_list):
+            # generate random value here as example
+            my_val = np.random.normal(ind_t + ind_c, 1, 1)[0]
+            df_2way_rm.loc[my_row] = [sub_id, task, con, my_val]
+            my_row = my_row + 1
+
+# conduct ANOVA using mixedlm
+my_model_fit = smf.mixedlm(&quot;my_value ~ task * condition&quot;, df_2way_rm, groups=df_2way_rm[&quot;sub_id&quot;]).fit()
+# get fixed effects
+my_model_fit.summary()
+# get random effects
+my_model_fit.random_effects
+
+# conduct ANOVA using AnovaRM
+my_model_fit = AnovaRM(df_2way_rm, 'my_value', 'sub_id', within=['task', 'condition']).fit()
+print(my_model_fit.anova_table)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;4-way-anova-with-between-group-and-within-group-factors-repeated-measures&quot;&gt;4-way ANOVA with between-group and within-group factors (repeated measures)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;If we wanted to conduct a mixed-model ANOVA that includes between-subject factors (group and language) and within-subject factors (task and condition), can do this using the &lt;code class=&quot;highlighter-rouge&quot;&gt;mixedlm&lt;/code&gt; function, similar as shown above:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;group_list = ['control','patient1','patient2']
+language_list = ['English', 'German', 'French']
+subs_list = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+task_list = ['task1', 'task2', 'task3']
+condition_list = ['pre', 'post']
+
+# read data into dataframe
+df_full = pd.DataFrame(columns=[&quot;group&quot;, &quot;language&quot;, &quot;sub_id&quot;, &quot;task&quot;, &quot;condition&quot;, &quot;my_value&quot;])
+my_row = 0
+# unique subject-ID
+sub_id = 0
+for ind_g, group in enumerate(group_list):
+    for ind_l, lan in enumerate(language_list):
+        for sub in subs_list:
+            sub_id = sub_id + 1
+            for ind_t, task in enumerate(task_list):
+                for ind_c, con in enumerate(condition_list):
+                    # generate random value here as example
+                    my_val = np.random.normal(ind_c + ind_t, 1, 1)[0]
+                    df_full.loc[my_row] = [group, lan, sub_id, task, con, my_val]
+                    my_row = my_row + 1
+
+# conduct ANOVA using mixedlm
+my_model_fit = smf.mixedlm(&quot;my_value ~ group * language * condition&quot;, df_full, groups=df_full[&quot;sub_id&quot;]).fit().summary()
+# get fixed effects
+my_model_fit.summary()
+# get random effects
+my_model_fit.random_effects
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h1 id=&quot;move-from-python-to-r&quot;&gt;Move from Python to R&lt;/h1&gt;
+&lt;p&gt;As demonstrated above, most linear models can be succesfully be implemented in Python. The only limitation is that crossed-random effects are not supported. If this is needed, or for other reasons, we might want to run our analysis in R instead. An easy way to convert between both frameworks by writing out the dataframe to csv-format, which can be read by both Python and R. Here, we the data for two of the ANOVAs that we conducted above, to demonstrate that the results in R are exactly the same.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;df_2way.to_csv('df_2way.csv', index=False)
+df_full.to_csv('df_full.csv', index=False)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;2-way-anova-in-r-between-subject-factors&quot;&gt;2-way ANOVA in R (between-subject factors)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;We will start with the 2-way between-subjects ANOVA, which can be conducted with the R package &lt;code class=&quot;highlighter-rouge&quot;&gt;lm&lt;/code&gt;. We can also access the underlying model matrix and inspect it to verify that the same model is applied in both Python and R. Similar as in Patsy, we can also change the coding scheme for the categorical factors.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# ! R code now, not Python!
+
+library(readr)
+
+# read in data from 2-way ANOVA with between-subject factors
+df_2way &amp;lt;- read_csv(&quot;df_2way.csv&quot;)
+# fit linear model and get parameter estimates
+model_fit &amp;lt;- lm(my_value ~ group * condition, df)
+# display anova table
+anova(model_fit)
+# display results of linear regression
+summary(model_fit)
+
+# access underlying model
+my_glm = model.matrix(model_fit)
+# inspect GLM
+image(t(my_glm))
+
+# change coding scheme
+model_fit &amp;lt;- lm(my_value ~ group * condition, df, contrasts = list(group = &quot;contr.sum&quot;, condition = &quot;contr.sum&quot;))
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+&lt;h1 id=&quot;4-way-anova-in-r-between-subject-and-within-subject-factors&quot;&gt;4-way ANOVA in R (between-subject and within-subject factors)&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;p&gt;In a very similar fashion, we can perform an ANOVA that includes within-subject factors and random effects. In this case we use the &lt;code class=&quot;highlighter-rouge&quot;&gt;lme4&lt;/code&gt; package.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;library(lme4)
+library(lmerTest)
+
+# read in data from 4-way ANOVA with between-subject and within-subject factors
+df_full &amp;lt;- read_csv(&quot;df_full.csv&quot;)
+
+# get parameter estimates from a linear regression with random effects
+my_model_fit &amp;lt;- lmer(my_value ~ group * language * task * condition + (1|sub_id), df_full)
+# display results of linear regression
+summary(my_model_fit)
+# main and interaction effects
+anova(my_model_fit)
+# random effects
+rand(my_model_fit)
+
+# access underlying model for fixed effects
+my_glm_fe = model.matrix(my_model_fit)
+# access underlying model for random effects
+my_glm_re = getME(my_model_fit, &quot;Zt&quot;)
+# inspect matrices
+image(t(my_glm_fe))
+image(t(my_glm_re))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h1&gt;
+&lt;p&gt;As concluding remark, I would like to encourage you to build the model matrix for your ANOVA by hand and to compare it to the automatic matrix generation in Patsy using different coding schemes. General linear models are a powerful statistical tool that is widely used in psychological and neuroimaging data analysis, so it’s worth wrapping your head around the underlying principles. Below, I post some links that I found useful when preparing this tutorial.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;
+
+&lt;h3 id=&quot;useful-links&quot;&gt;Useful links:&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Coding schemes for categorical factors:&lt;br /&gt;
+https://stats.idre.ucla.edu/spss/faq/coding-systems-for-categorical-variables-in-regression-analysis-2/&lt;/li&gt;
+  &lt;li&gt;Python vs. R:&lt;br /&gt;
+https://medium.com/@data_driven/python-vs-r-for-data-science-and-the-winner-is-3ebb1a968197&lt;/li&gt;
+  &lt;li&gt;Repeated-measures ANOVA in Python:&lt;br /&gt;
+https://www.marsja.se/repeated-measures-anova-using-python/&lt;/li&gt;
+  &lt;li&gt;Statsmodels mixedlm and lme4:
+https://www.statsmodels.org/stable/examples/notebooks/generated/mixed_lm_example.html&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">In one of my previous blog posts I talked about how to pick the right statistical hypothesis test for your experimental design. One of the most heavily used family of tests for psychological and in general for experimental research is Analysis of Variance (ANOVA). Most analysis frameworks have build-in implementations for ANOVAs – with different strengths and limitations. But in order to set up and interpret your ANOVA correctly, it is necessary to understand it in the more general context of linear models and linear regression.</summary></entry><entry><title type="html">Find your way through the jungle of Statistical Hypothesis Tests</title><link href="/2019/09/01/Hypothesis_tests.html" rel="alternate" type="text/html" title="Find your way through the jungle of Statistical Hypothesis Tests" /><published>2019-09-01T00:00:00-04:00</published><updated>2019-09-01T00:00:00-04:00</updated><id>/2019/09/01/Hypothesis_tests</id><content type="html" xml:base="/2019/09/01/Hypothesis_tests.html">&lt;p&gt;In many behavioural experiments we want to compare an outcome measure across different groups of subjects or different experimental conditions. But even after several years of doing data analysis, I have to remind myself about the right statistical analysis to perform even a simple hypothesis test. The fact that different analysis frameworks use different implementations of the tests further complicates the issue. That’s why I composed a decision tree for the situation, where we are comparing the average of a continuous dependent variable (i.e. the outcome measure) based on categorical variables.&lt;/p&gt;
+
+&lt;p&gt;The questions that you typically have to ask yourself are:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;How many factors are included in the design? = How many categorical variables do I have?&lt;/li&gt;
+  &lt;li&gt;How many levels does each factor have? = How many conditions do I have?&lt;/li&gt;
+  &lt;li&gt;Do I have a beween-subjects or a within-subjects design? = Am I comparing one group or several groups?&lt;/li&gt;
+  &lt;li&gt;Are the measures dependent or independent?&lt;/li&gt;
+  &lt;li&gt;Do I have a repeated-measures design? Do I need to account for random effects for subjects?&lt;/li&gt;
+  &lt;li&gt;Does my data fulfill the criteria for a parametric test (normal distribution, equal variances, etc.)?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The overview below might give you some guidance on which test to use. I also included the name of the test implementation in Python and R.&lt;/p&gt;
+
+&lt;hr /&gt;
+&lt;h1 id=&quot;decision-tree-for-statistical-hypothesis-tests&quot;&gt;Decision tree for Statistical Hypothesis Tests&lt;/h1&gt;
+&lt;hr /&gt;
+&lt;h3 id=&quot;one-factor-one-level&quot;&gt;one factor, one level&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;independent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;t-test&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.ttest_ind&lt;/li&gt;
+          &lt;li&gt;R: t.test&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Mann Whitney U test&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.mannwhitneyu&lt;/li&gt;
+          &lt;li&gt;R: wilcox.test (Mann-Whitney-Wilcoxon Test)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;dependent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;paired t-test&lt;/li&gt;
+          &lt;li&gt;one-sample t-test on the differences&lt;/li&gt;
+          &lt;li&gt;equivalent: GLM with random effects for each subject&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.ttest_rel&lt;/li&gt;
+          &lt;li&gt;R: t.test(paired=TRUE)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Wilcoxon sum-rank test&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.wilcoxon&lt;/li&gt;
+          &lt;li&gt;R: wilcox.test(paired=TRUE) (Wilcoxon Signed-Rank Test)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;one-factor-multiple-levels&quot;&gt;one factor, multiple levels&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;independent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;one-way ANOVA&lt;/li&gt;
+          &lt;li&gt;python: statsmodels.formula.api.ols&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.f_oneway&lt;/li&gt;
+          &lt;li&gt;R: lm&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Kruskal-Wallis test&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.kruskal&lt;/li&gt;
+          &lt;li&gt;R: kruskal.test&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;dependent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;repeated-measures one-way ANOVA (with random effects)&lt;/li&gt;
+          &lt;li&gt;python: statsmodels.stats.anova.AnovaRM&lt;br /&gt;
+(only implemented for fully balanced within-subject designs)&lt;/li&gt;
+          &lt;li&gt;R: lm&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Friedman test&lt;/li&gt;
+          &lt;li&gt;python: scipy.stats.friedmanchisquare&lt;/li&gt;
+          &lt;li&gt;R: friedman.test&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;two-factors-multiple-levels&quot;&gt;two factors, multiple levels&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;independent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;two-way ANOVA&lt;/li&gt;
+          &lt;li&gt;statsmodels.formula.api.ols&lt;/li&gt;
+          &lt;li&gt;R: lme4 (lmer)&lt;/li&gt;
+          &lt;li&gt;R: aov (not recommended)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;Scheirer-Ray-Hare test&lt;/li&gt;
+          &lt;li&gt;Python and R: not available&lt;/li&gt;
+          &lt;li&gt;build a general linear mixed model by hand and do bootstrapping&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;dependent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;repeated measures two-way ANOVA&lt;/li&gt;
+          &lt;li&gt;python: statsmodels.stats.anova import AnovaRM&lt;br /&gt;
+  (only implemented for fully balanced within-subject designs)&lt;/li&gt;
+          &lt;li&gt;python: statsmodels.formula.api.mixedlm&lt;/li&gt;
+          &lt;li&gt;statsmodels does not support crossed random effects (i.e. only one group)&lt;/li&gt;
+          &lt;li&gt;R: lme4 (lmer)&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;build a general linear mixed model by hand and do bootstrapping&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;more-than-two-factors&quot;&gt;more than two factors&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;independent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;n-way ANOVA&lt;/li&gt;
+          &lt;li&gt;python and R, see above for two factors&lt;/li&gt;
+          &lt;li&gt;non-parametric test&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;build a general linear mixed model by hand and do bootstrapping&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;dependent measurements&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;em&gt;parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;n-way repeated measures ANOVA&lt;/li&gt;
+          &lt;li&gt;python and R, see above for two factors&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;&lt;em&gt;non-parametric test&lt;/em&gt;
+        &lt;ul&gt;
+          &lt;li&gt;python and R: not implemented&lt;/li&gt;
+          &lt;li&gt;build a general linear mixed model by hand and do bootstrapping&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">In many behavioural experiments we want to compare an outcome measure across different groups of subjects or different experimental conditions. But even after several years of doing data analysis, I have to remind myself about the right statistical analysis to perform even a simple hypothesis test. The fact that different analysis frameworks use different implementations of the tests further complicates the issue. That’s why I composed a decision tree for the situation, where we are comparing the average of a continuous dependent variable (i.e. the outcome measure) based on categorical variables.</summary></entry><entry><title type="html">From spiders and sliders and seaborn: Useful plotting options in Python</title><link href="/2019/08/27/plotting-in-python.html" rel="alternate" type="text/html" title="From spiders and sliders and seaborn: Useful plotting options in Python" /><published>2019-08-27T00:00:00-04:00</published><updated>2019-08-27T00:00:00-04:00</updated><id>/2019/08/27/plotting-in-python</id><content type="html" xml:base="/2019/08/27/plotting-in-python.html">&lt;p&gt;Data visualization plays a key role in quantitative research and as the saying goes ‘a picture speaks a thousand words’. For any step from raw data to final results figure, we continuously need to assess the quality of our data and check if our manipulations and computations do what we expect them to do. Unfortunately, you often might find yourself tinkering around for hours with x-ticks and subplot positions or even making a sloppy mistake in the axis labels, which could lead to completely misleading conclusions. That’s why it’s indispensable to know how to use plotting tools that are quick, flexible and reliable.&lt;/p&gt;
+
+&lt;p&gt;Here, I want to talk you through four examples of plots that I keep reusing for different purposes, and you can find all the code shown here in my Github repository: &lt;code class=&quot;highlighter-rouge&quot;&gt;https://github.com/NicoleEic/projects&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;1-seaborns-catplot&quot;&gt;1) Seaborn’s catplot&lt;/h1&gt;
+
+&lt;p&gt;Seaborn is a data visualization library that is based on matplotlib and it truly stands out by its simplicity to use. Check out their web gallery to have a look at the variety of plots that can be generated with just a few lines of code: &lt;code class=&quot;highlighter-rouge&quot;&gt;https://seaborn.pydata.org/examples/index.html&lt;/code&gt;. Since I discovered how well Python’s pandas data structure and seaborn work together, I convert my data to a DataFrame whenever possible. Seaborn’s catplot is a great tool for showing the relationship of a continuous variable to different categorical factors with multiple levels. The simulated data in the example below could be the result of a brain stimulation experiment, where we measured the strength of a resting-state network in both hemispheres, within multiple regions of the brain, before and after brain stimulation.&lt;/p&gt;
+
+&lt;p&gt;In the overhead section, I hard-coded the factors and levels as lists, but you might consider reading in your particpant ID from a &lt;code class=&quot;highlighter-rouge&quot;&gt;participants.tsv&lt;/code&gt; file, as I described in &lt;a href=&quot;https://nicoleeic.github.io/2019/08/07/some-bits-about-bids.html&quot;&gt;my post about BIDS&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+# --------
+# overhead
+# --------
+rootdir = 'my/path/somewhere/'
+subs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+ROI_list = ['ROI1', 'ROI2', 'ROI3', 'ROI4']
+condition_list = ['pre', 'post']
+hemi_list = [&quot;L&quot;, &quot;R&quot;]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the next section I read in the data into a pandas DataFrame using loops, so that each measurement occupies a row. In case your DataFrame has been set up in a different way, you can use pandas’s reshaping methods such as melt un-/stack or pivot to bring it, well, in shape.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# --------
+# read data into DataFrame
+# --------
+df = pd.DataFrame(columns=[&quot;subj&quot;, &quot;ROI&quot;, &quot;hemi&quot;, &quot;condition&quot;, &quot;my_value&quot;])
+my_row = 0
+for sub in subs:
+    # location of subject's derived data according to BIDS format
+    OD = os.path.join('rootdir', 'derivatives', 'sub-' + sub)
+    for ind_r, ROI in enumerate(ROI_list):
+        for hemi in hemi_list:
+            for ind_c, cond in enumerate(condition_list):
+                # generate random value here as example
+                my_val = my_val = np.random.uniform(0, 10) + ind_r + ind_c
+                df.loc[my_row] = [sub, ROI, hemi, cond, my_val]
+                my_row = my_row + 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For the actual plotting command, you only need a single line! Here, I chose a violin plot, but just by changing the ‘kind’ option the display can be converted to a boxplot, pointplot, etc.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# --------
+# plotting using seaborn
+# --------
+sns.catplot(x=&quot;ROI&quot;, y=&quot;my_value&quot;, data=df, dodge=True, hue='condition', col='hemi', kind='violin')
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plot1.png&quot; alt=&quot;'Example catplot'&quot; /&gt;
+There are certainly many ways to improve the look of this plot, but I wanted to demonstrate that even the minimal set of inputs to the plotting command produces a clear and informative visualization of the data.&lt;/p&gt;
+
+&lt;h1 id=&quot;2-spider-plot-in-matplotlib&quot;&gt;2) Spider plot in matplotlib&lt;/h1&gt;
+
+&lt;p&gt;Spider (or web/polar/radar) plots show data on multiple axis that all originate from one point. In neuroscience, spider plots can be used, for example, to visualize a brain area’s ‘connectional fingerprint’&lt;sup&gt;1&lt;/sup&gt;. On each axis we plot the strength of connection between a brain area (or a white matter tract) with other regions of interest. The example below could be from an analysis, where we are comparing the connectivity profiles of two white matter tracts.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# --------
+# overhead
+# --------
+rootdir = 'my/path/somewhere/'
+subs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+tract_list = ['tract1', 'tract2']
+ROI_list = ['ROI1', 'ROI2', 'ROI3', 'ROI4', 'ROI5', 'ROI6']
+hemi_list = ['L', 'R']
+
+# --------
+# read data into dataframe
+# --------
+df = pd.DataFrame(columns=[&quot;subj&quot;, &quot;ROI&quot;, &quot;tract&quot;, &quot;hemi&quot;, &quot;my_value&quot;])
+my_row = 0
+for sub in subs:
+    OD = os.path.join('rootdir', 'derivatives', 'sub-' + sub)
+    for ROI in ROI_list:
+        for tract in tract_list:
+            for hemi in hemi_list:
+                # generate random value here as example
+                my_val = np.random.randint(10)
+                df.loc[my_row] = [sub, ROI, tract, hemi, my_val]
+                my_row = my_row + 1
+
+# make 'my_value' column explicitly numeric to allow for groupby operation below
+df.my_value = pd.to_numeric(df.my_value)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;It’s possible to use seaborn to make a spider plot, but it requires passing down arguments to the underlying matplotlib objects, which I find quite unintuitive and I’d rather use matplotlib directly. The plotting command requires a few lines of code and we have to generate errorbars manually, but this snipped can be easily adapted for all sorts of spider plots.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# --------
+# plotting
+# --------
+# make equally spaced angles for each of the ROIs
+sections = np.linspace(0.0, 2 * np.pi, len(df.ROI.unique()), endpoint=False)
+# width of bars
+width = 0.2
+for he, hemi in enumerate(hemi_list):
+    ax = plt.subplot(1, 2, he + 1, projection='polar')
+    for tr, tract in enumerate(tract_list):
+        # compute means
+        my_means = df[(df.hemi == hemi) &amp;amp; (df.tract == tract)].groupby('ROI').my_value.mean().values
+        # compute standard error of the mean for error bars
+        my_errs = df[(df.hemi == hemi) &amp;amp; (df.tract == tract)].groupby('ROI').my_value.std().values / np.sqrt(len(subs))
+        # move (error-)bars of the second tract one bar width along the circle
+        # so that both bar types are visible next to each other
+        bars = ax.bar(sections + tr * width, my_means, width=width, bottom=0.0)
+        err_bars = ax.errorbar(sections + tr * width, my_means, my_errs, fmt='.', c='black')
+    ax.set_title(hemi)
+    ax.set_xticks(sections)
+    ax.set_xticklabels(ROI_list)
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plot2.png&quot; alt=&quot;'Example spider plot'&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;3-interactive-slider&quot;&gt;3) Interactive slider&lt;/h1&gt;
+
+&lt;p&gt;In the examples above we plotted a continuous variable with respect to categorical factors. If you have an additional continuous factor as explanatory variable, however, it might not be possible to plot all factors alongside. In this case, you can use a slider to ‘move along’ an additional dimension to explore your data. The example below could be a from a study, where we measured the power of the MEG signal in a certain frequency band in both hemispheres under varying light intensities.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import os
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import Slider
+import pandas as pd
+import seaborn as sns
+
+# --------
+# overhead
+# --------
+rootdir = 'my/path/somewhere/'
+subs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+intensity_list = np.arange(0, 101)
+hemi_list = [&quot;L&quot;, &quot;R&quot;]
+
+# --------
+# read data into dataframe
+# --------
+df = pd.DataFrame(columns=[&quot;subj&quot;, &quot;hemi&quot;, &quot;intensity&quot;, &quot;my_value&quot;])
+my_row = 0
+for sub in subs:
+    OD = os.path.join('rootdir', 'derivatives', 'sub-' + sub)
+    for hemi in hemi_list:
+        for intensity in intensity_list:
+            # use random value here as example
+            my_val = np.random.randint(40) + intensity
+            df.loc[my_row] = [sub, hemi, intensity, my_val]
+            my_row = my_row + 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We set up the figure with a subplot for the actual plot and the matplotlib widget ‘slider’ initialized with a certain value.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# initialize matplotlib figure
+fig, ax = plt.subplots(figsize=(4, 4))
+# adjust the subplots region to leave some space for the sliders and buttons
+fig.subplots_adjust(bottom=0.25)
+# define an axes area and draw a slider in it
+my_slider_ax = fig.add_axes([0.25, 0.1, 0.65, 0.03])
+# intensity level chosen for initialization
+intensity_init = 50
+# generate slider with initial value
+my_slider = Slider(my_slider_ax, 'intensity (%)', 0, 100, valinit=intensity_init)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, we define a function that will be executed when the slider value is changed and link it to the slider widget.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# define an action for when the slider's value changes
+def slider_action(val):
+    # the figure is updated when the slider is changed
+    update_plot(np.round(val))
+
+
+# link slider_action function to slider object
+my_slider.on_changed(slider_action)
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I defined a function of how to update the plot, which requires clearing the figure axis and re-drawing the figure. For other types of plots there are re-drawing functions that don’t require you to clear the figure, which is more efficient.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# define how to update the plot
+def update_plot(intensity):
+    # clear the axis before the plot is redrawn
+    ax.clear()
+    sns.boxplot(x=&quot;hemi&quot;, y=&quot;my_value&quot;, data=df[df.intensity == intensity], ax=ax)
+    # keep the axis limits constant for better visibility of the changes
+    ax.set_ylim(0, np.max(df.my_value.values))
+    # update figure
+    fig.canvas.draw_idle()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At the end of the script, we call the ‘update_plot’ function to draw the initial plot and display the figure.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# draw initial plot with default intensity
+update_plot(intensity_init)
+# display figure
+plt.show()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plot3.gif&quot; alt=&quot;'Interactive slider'&quot; height=&quot;300px&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;4-embedding-plots-in-a-gui&quot;&gt;4) Embedding plots in a GUI&lt;/h1&gt;
+
+&lt;p&gt;If you like the interactive character of the plot above, you might even want to go a step further and embed your plot within a Graphical Use Interface (GUI). Tkinter is a commonly used framework for GUI development in Python, which comes with many functionalities for user interaction. Below I show an example, where the user can interact directly with the objects drawn in the plot. In another example, &lt;a href=&quot;https://github.com/NicoleEic/projects/tree/master/timeline&quot;&gt;which you can find on my Github&lt;/a&gt;, I generated a time frame and linked a mouse click to scraping the web to display an image within the GUI.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import tkinter as tk
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
+
+# --------
+# overhead
+# --------
+rootdir = 'my/path/somewhere/'
+subs = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
+ROI_list = ['ROI1', 'ROI2', 'ROI3', 'ROI4']
+hemi_list = [&quot;L&quot;, &quot;R&quot;]
+
+# --------
+# read data into dataframe
+# --------
+df = pd.DataFrame(columns=[&quot;subj&quot;, &quot;ROI&quot;, &quot;hemi&quot;, &quot;my_value&quot;])
+my_row = 0
+for sub in subs:
+    OD = os.path.join('rootdir', 'derivatives', 'sub-' + sub)
+    for ind_r, ROI in enumerate(ROI_list):
+        for hemi in hemi_list:
+            # generate random value here as example
+            my_val = np.random.randint(10) + ind_r
+            df.loc[my_row] = [sub, ROI, hemi, my_val]
+            my_row = my_row + 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that we need to initialize the tkinter widget before we define the plot.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# --------
+# Set up TK-widget
+# --------
+root = tk.Tk()
+root.wm_title(&quot;Matplotlib embedded in Tkinter&quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Here comes the plotting part, where you need to create a handle for the figure (here: fig). In this example I’m drawing multiple (quite meaningless) rectangles, which I store in a list so that we can refer to them later.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# --------
+# plotting
+# --------
+# initialize matplotlib figure
+fig, ax = plt.subplots(figsize=(4, 4))
+# generate mutliple patches from data
+my_patches = []
+for ind_r, ROI in enumerate(ROI_list):
+    # get a rectangle reaching from lowest to highest value for each ROI
+    rect = patches.Rectangle((np.min(df[(df.hemi == &quot;L&quot;) &amp;amp; (df.ROI == ROI)].my_value.values) + 1, ind_r + 1), np.max(df[(df.hemi == &quot;L&quot;) &amp;amp; (df.ROI == ROI)].my_value.values), 0.5)
+    ax.add_patch(rect)
+    my_patches.append(rect)
+
+# hard-code axis limits for better visibility
+ax.set_xlim(0, 15)
+ax.set_ylim(0.5, len(ROI_list) + 1)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the next section I’m linking the matplotlib figure to the tkinter widget.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# link figure to tkinter
+canvas = FigureCanvasTkAgg(fig, master=root)
+canvas.draw()
+canvas.get_tk_widget().pack()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In this example I want to display the label of the ROI a user clicks on in a text label below the plot. This is how I initialize the text label in the widget:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# define settings for text lable below figure
+output_val = tk.StringVar()
+output_lbl = tk.Label(textvariable=output_val).pack()
+output_val.set(&quot;&quot;)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, I define the action that happens when the mouse is clicked. Other user actions that could be captured are, for example, mouseover or a key press. This function is then linked to the figure canvas.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# define what happens when the figure is clicked
+def mouse_click(event):
+    # find the ROI associated with the selected patch
+    for ROI, patch in zip(ROI_list, my_patches):
+        if patch.contains(event)[0]:
+            # update the text in the label
+            output_val.set(ROI)
+            return
+
+# link mouse_click function to figure
+canvas.mpl_connect('button_press_event', mouse_click)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As a last line we need to execute the widget, so that GUI is visible when the script is called from the command line. While the mainloop is running, python halts and checks for user input.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# execute widget
+tk.mainloop()
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/plot4.png&quot; alt=&quot;'Plot embedded in GUI for user interaction'&quot; height=&quot;300px&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h1&gt;
+&lt;p&gt;There are myriads of plotting functions, options and tools out there which keep changing and evolving. The above examples were quite useful for my everyday work and hopefully they gave you some ideas about how to read in your data and how to plot it.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Passingham RE, Stephan KE, Kotter R. 2002. The anatomical basis of functional localization in the cortex. Nat Rev Neurosci 3:606–16.&lt;/p&gt;</content><author><name></name></author><summary type="html">Data visualization plays a key role in quantitative research and as the saying goes ‘a picture speaks a thousand words’. For any step from raw data to final results figure, we continuously need to assess the quality of our data and check if our manipulations and computations do what we expect them to do. Unfortunately, you often might find yourself tinkering around for hours with x-ticks and subplot positions or even making a sloppy mistake in the axis labels, which could lead to completely misleading conclusions. That’s why it’s indispensable to know how to use plotting tools that are quick, flexible and reliable.</summary></entry><entry><title type="html">Three examples of PALM: Permutation Analysis of Linear Models</title><link href="/2019/08/18/PALM.html" rel="alternate" type="text/html" title="Three examples of PALM: Permutation Analysis of Linear Models" /><published>2019-08-18T00:00:00-04:00</published><updated>2019-08-18T00:00:00-04:00</updated><id>/2019/08/18/PALM</id><content type="html" xml:base="/2019/08/18/PALM.html">&lt;p&gt;Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) &lt;i&gt;p&lt;/i&gt;-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a &lt;i&gt;t&lt;/i&gt;-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing.&lt;/p&gt;
+
+&lt;p&gt;A great tool to perform permutation tests is PALM (&lt;b&gt;P&lt;/b&gt;ermutation &lt;b&gt;A&lt;/b&gt;nalysis of &lt;b&gt;L&lt;/b&gt;inear &lt;b&gt;M&lt;/b&gt;odels&lt;sup&gt;1&lt;/sup&gt;, https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM). One of the advantages of PALM is the flexibility of input data, because it can work with both volumetric and surface neuroimaging data. Another key feature is that you have strong control over the shuffling strategies even for complex designs. Furthermore, PALM corrects for for multiple testing over multiple contrasts or modalities. In general, the statistics are handled very carefully in PALM allowing you to specify a great range of options, which are detailed in the User Guide.&lt;/p&gt;
+
+&lt;p&gt;Below, I will talk you through three examples of how PALM can be used with different study designs and different input data.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-1-simple-t-test-with-input-data-1d-vector&quot;&gt;Example 1) Simple &lt;i&gt;t&lt;/i&gt;-test (with input data: 1D vector)&lt;/h2&gt;
+&lt;p&gt;Let’s consider the situation where you compare a single measurement in 6 control subjects and 6 patients. Our input data is a vector with 12 elements, combining the data of both groups. We store the vector as column in the file ‘my_input.csv’.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;7.05
+4.44
+5.32
+etc...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;For the design, we construct a linear model consisting of a single explanatory variable (EV) for the factor group, i.e. -1 for control and 1 for patient. In addition, we include a constant EV to model the grand mean. The design is stored in the file ‘my_design.csv’. Here, I won’t go into the background of how to build a general linear model (GLM), but the following website contains very useful help on this topic: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/GLM.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# build the design in python:
+n_subs = 6
+n_groups = 2
+ev_group = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+grand_mean = np.ones(n_subs * n_groups).reshape(-1,1)
+my_design = np.hstack((ev_group, grand_mean))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=&quot;,&quot;)
+
+# the design file will look like this:
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Because we are running a two-tailed &lt;i&gt;t&lt;/i&gt;-test, we need only one row for the contrast of interest, which is stored in ‘my_contrast.csv’.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1, 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;PALM can be called from the command line using the following settings:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$path_to_palm/palm -i my_input.csv -d my_design.csv -t my_contrast.csv -o my_output -n 5000 -twotail
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Our output files are the following:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;my_output_dat_tstat.csv
+my_output_dat_tstat_fwep.csv
+my_output_dat_tstat_uncp.csv
+my_output_elapsed.csv
+my_output_palmconfig.txt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The t-statistic is stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_dat_tstat.csv&lt;/code&gt; and the associated &lt;i&gt;p&lt;/i&gt;-value in &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_dat_tstat_uncp.csv&lt;/code&gt;. Family-wise error correction does not have an effect in this case, so the file &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_dat_tstat_fwep.csv&lt;/code&gt; will be identical.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-2-2-x-3-factorial-design-with-input-data-volumetric-imaging-files&quot;&gt;Example 2) 2 x 3 Factorial design (with input data: volumetric imaging files)&lt;/h2&gt;
+&lt;p&gt;In the following example, we’re considering the situation, where we have an additional factor in the design, for example an experimental condition where the subjects received a drug: two of the six control subjects received placebo, two received drug1 and two drug2 and the same for the patient group ( - this is just an illustrative example, a sample size of 2 would be ridiculous for a drug study!). In those 12 subjects, we acquired an anatomical brain scan and we are interested to see if and where the brains of patients are different and if the drugs have an effect on the brain and on the difference in patients. Statistically speaking, we are looking at the voxel-wise main effect of factor ‘group’ (which has two factors: control and patient), the main effect of factor ‘condition’ (which has three factors: placebo, drug1, drug2) and the interaction effect of ‘group’ and ‘condition’.&lt;/p&gt;
+
+&lt;p&gt;I assume that the brain scans have been registered to MNI space and they are stored according to BIDS format in $my_study_dataset/derivatives/sub-control01/MNINonLinear/sub-control01_T1w.nii.gz and $my_study_dataset/derivatives/sub-patient01/MNINonLinear/sub-patient01_T1w.nii.gz (and so on for the other subjects). To make the scans suitable as input for PALM, we have to merge them into a single 4-dimensional file. Here, I use FSL&lt;sup&gt;2&lt;/sup&gt; tools to manipulate the files:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# initialize file of merged volumes with one dummy volume, which will be removed later
+imcp $my_study_dataset/derivatives/sub-control01/MNINonLinear/sub-control01_T1w.nii.gz my_input.nii.gz
+
+# loop over control subjects and patients
+for group in control patient; do
+    for sub in 01 02 03 04 05 06; do
+        fslmerge -t my_input.nii.gz$merged_files $my_study_dataset/derivatives/sub-${group}${sub}/MNINonLinear/sub-${group}${sub}_T1w.nii.gz
+    done
+done
+
+# remove first dummy volume
+pdim=$(fslval my_input.nii.gz &quot;dim4&quot;)
+fslroi my_input.nii.gz my_input.nii.gz 1 $(( $pdim - 1))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The design file ‘my_design.csv’ will start with one EV for the ‘group’ factor (column 1) like above for the &lt;i&gt;t&lt;/i&gt;-test. The next two EVs model the main effect of the factor ‘condition’. The interaction effect is modelled by two EVs (column 4 and 5) and the last column models the grand mean:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# build the design in python:
+n_subs = 6
+n_groups = 2
+n_subs_in_con = 2
+ev_group = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+ev_condition_1 = np.tile(np.array([-1,0,1)].repeat(n_subs_in_con),n_groups).reshape(-1,1)
+ev_condition_2 = np.tile(np.array([-1,1,0]).repeat(n_subs_in_con),n_groups).reshape(-1,1)
+ev_interaction_1 = ev_group * ev_condition_1
+ev_interaction_2 = ev_group * ev_condition_2
+grand_mean = np.ones(n_subs * n_groups).reshape(-1,1)
+my_design = np.hstack((ev_group, ev_condition_1, ev_condition_2, ev_interaction_1, ev_interaction_2, grand_mean))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=&quot;,&quot;)
+
+# the resulting design file will look like this:
+-1, -1, -1, 1, 1, 1
+-1, -1, -1, 1, 1, 1
+-1, 0, 1, 0, -1, 1
+-1, 0, 1, 0, -1, 1
+-1, 1, 0, -1, 0, 1
+-1, 1, 0, -1, 0, 1
+1, -1, -1, -1, -1, 1
+1, -1, -1, -1, -1, 1
+1, 0, 1, 0, 1, 1
+1, 0, 1, 0, 1, 1
+1, 1, 0, 1, 0, 1
+1, 1, 0, 1, 0, 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The contrast file ‘my_contrast.csv’ contains one row each to code for each of the EVs we defined for the two main effects and the interaction effects:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1, 0, 0, 0, 0, 0
+0, 1, 0, 0, 0, 0
+0, 0, 1, 0, 0, 0
+0, 0, 0, 1, 0, 0
+0, 0, 0, 0, 1, 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As the factor ‘condition’ has multiple levels, we want to derive the &lt;i&gt;F&lt;/i&gt;-statistic associated with the two contrasts for this factor and the two contrasts for the interaction effect. We model this in the file ‘my_f_tests.csv’, which contains one row to code for the two condition EVs and one row to code for the two interaction contrasts. Note that PALM doesn’t perform rank-1 &lt;i&gt;F&lt;/i&gt;-tests, which would be associated with the main effect of ‘group’, because the factor only has two levels.&lt;/p&gt;
+
+&lt;p&gt;This is how the &lt;i&gt;F&lt;/i&gt;-contrast file will look like:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;0, 1, 1, 0, 0
+0, 0, 0, 1, 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The PALM-call looks similar as above, but it includes the -f option to perform the &lt;i&gt;F&lt;/i&gt;-tests. We also include the &lt;code class=&quot;highlighter-rouge&quot;&gt;-noniiclass&lt;/code&gt; option, because we are using a gzipped nifti image as input:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$path_to_palm/palm -i my_input.nii.gz -d my_design.csv -t my_contrast.csv -f my_f_tests.csv -o my_output -n 5000 -twotail -noniiclass
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As output we get the following files:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;my_output_vox_fstat_c6.nii.gz
+my_output_vox_fstat_c7.nii.gz
+my_output_vox_fstat_fwep_c6.nii.gz
+my_output_vox_fstat_fwep_c7.nii.gz
+my_output_vox_fstat_uncp_c6.nii.gz
+my_output_vox_fstat_uncp_c7.nii.gz
+my_output_vox_tstat_c1.nii.gz
+my_output_vox_tstat_c2.nii.gz
+my_output_vox_tstat_c3.nii.gz
+my_output_vox_tstat_c4.nii.gz
+my_output_vox_tstat_c5.nii.gz
+my_output_vox_tstat_fwep_c1.nii.gz
+my_output_vox_tstat_fwep_c2.nii.gz
+my_output_vox_tstat_fwep_c3.nii.gz
+my_output_vox_tstat_fwep_c4.nii.gz
+my_output_vox_tstat_fwep_c5.nii.gz
+my_output_vox_tstat_uncp_c1.nii.gz
+my_output_vox_tstat_uncp_c2.nii.gz
+my_output_vox_tstat_uncp_c3.nii.gz
+my_output_vox_tstat_uncp_c4.nii.gz
+my_output_vox_tstat_uncp_c5.nii.gz
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As you can see, we get niftis image that store voxel-wise t-statistics and &lt;i&gt;p&lt;/i&gt;-values for each &lt;i&gt;t&lt;/i&gt;-test specified in the contrast file (c1 - c5). The corrected &lt;i&gt;p&lt;/i&gt;-value associated with the main effect of ‘group’ is stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_vox_tstat_fwep_c1.nii.gz&lt;/code&gt;. For the &lt;i&gt;F&lt;/i&gt;-tests (c6, c7), the &lt;i&gt;F&lt;/i&gt;-statistic and the associated &lt;i&gt;p&lt;/i&gt;-values are reported. The &lt;i&gt;p&lt;/i&gt;-values for the main effect of ‘condition’ are stored in &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_vox_fstat_fwep_c6.nii.gz&lt;/code&gt; and for the interaction effect in &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_vox_fstat_fwep_c7.nii.gz&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-3-hemispheric-differences-with-input-data-metric-surface-files&quot;&gt;Example 3) Hemispheric differences (with input data: metric surface files)&lt;/h2&gt;
+&lt;p&gt;For the last example, let’s assume a design, where we want to test if and where a specific resting-state network is different across the two hemispheres. We acquired data in 5 subjects and derived one metric file for each hemisphere. As the data from both hemispheres comes from the same subjects, it’s a repeated measures design. That’s why we model the random effect associated with each subject as additional column for each subject and we don’t need to model the grand mean anymore.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# build the design in python:
+n_subs = 5
+ev_hemisphere = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+random_effects = np.identity(n_subs)
+my_design = np.hstack((ev_hemisphere, np.vstack((random_effects, random_effects))))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=&quot;,&quot;)
+
+# the design file will look like this:
+-1, 1, 0, 0, 0, 0
+-1, 0, 1, 0, 0, 0
+-1, 0, 0, 1, 0, 0
+-1, 0, 0, 0, 1, 0
+-1, 0, 0, 0, 0, 1
+1, 1, 0, 0, 0, 0
+1, 0, 1, 0, 0, 0
+1, 0, 0, 1, 0, 0
+1, 0, 0, 0, 1, 0
+1, 0, 0, 0, 0, 1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For the contrast file, we are only interested in the first EV.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1, 0, 0, 0, 0, 0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to make the metric surface data suitable for PALM as input, we have to concatenate the files, similar as above for the volumetric example. Here, I’m using Connectome Workbench&lt;sup&gt;3&lt;/sup&gt; commands to manipulate the files. I’m assuming that the metric surface data has been resampled to the standard 32k_fs_LR surface mesh and an example filename would be &lt;code class=&quot;highlighter-rouge&quot;&gt;sub-01.L.restingstate.32k_fs_LR.func.gii&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# compose a string to pass as input to the workbench merging function
+command_str=&quot;&quot;
+
+# loop over hemisphere and subjects
+for hemi in L R ; do
+    for sub in 01 02 03 04 05; do
+        subject_file=$my_study_dataset/derivatives/sub-$sub/MNINonLinear/fsaverage_LR32k/sub-${sub}.${hemi}.corrThickness.32k_fs_LR.func.gii
+
+        # flip data on the right hemisphere to the left to allow them to be concatenated
+        if [[ $hemi == 'R' ]] ; then
+            wb_command -set-structure $subject_file CORTEX_LEFT
+        fi    
+
+        # append the command string
+        command_str=&quot;$command_str -metric $subject_file&quot;
+    done
+done
+
+# pass command string to the workbench function
+wb_command -metric-merge my_input.func.gii $command_str
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Having these files we can call PALM using the following command:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$path_to_palm/palm -i my_input.func.gii -d my_design.csv -t my_contrast.csv -o my_output -n 5000 -twotail
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The PALM-call will produce the following output files:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;my_output_dpv_tstat.func.gii
+my_output_dpv_tstat_fwep.gii
+my_output_dpv_tstat_uncp.gii
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;For the &lt;i&gt;p&lt;/i&gt;-values associated with the effect of hemisphere, the file of interest is &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_dpv_tstat_uncp.gii&lt;/code&gt;. In order to display the result onto a surface mesh, the file-extension needs to be changed (renamed) to &lt;code class=&quot;highlighter-rouge&quot;&gt;my_output_dpv_tstat_uncp.func.gii&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h1&gt;
+&lt;p&gt;In this post I described three simple examples of how PALM can be used, but there are many (!) more options available, so check out the PALM UserGuide to see which settings you might need. Also, I didn’t to go into depth about the GLM design, but there are many other excellent resources online.&lt;/p&gt;
+
+&lt;p&gt;Thanks for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Winkler, A. M., Ridgway, G. R., Webster, M. A., Smith, S. M. &amp;amp; Nichols, T. E. Permutation inference for the general linear model. NeuroImage 92, 381–397 (2014).&lt;/p&gt;
+
+&lt;p&gt;&lt;sup&gt;2&lt;/sup&gt; Jenkinson, M., Beckmann, C. F., Behrens, T. E. J., Woolrich, M. W. &amp;amp; Smith, S. M. FSL. NeuroImage 62, 782–790 (2012).&lt;/p&gt;
+
+&lt;p&gt;&lt;sup&gt;3&lt;/sup&gt; https://www.humanconnectome.org/software/connectome-workbench&lt;/p&gt;</content><author><name></name></author><summary type="html">Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) p-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a t-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing.</summary></entry><entry><title type="html">Spin your head - manual rigid body transformations</title><link href="/2019/08/11/spin-your-head.html" rel="alternate" type="text/html" title="Spin your head - manual rigid body transformations" /><published>2019-08-11T00:00:00-04:00</published><updated>2019-08-11T00:00:00-04:00</updated><id>/2019/08/11/spin-your-head</id><content type="html" xml:base="/2019/08/11/spin-your-head.html">&lt;p&gt;Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s&lt;sup&gt;1&lt;/sup&gt; FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!&lt;/p&gt;
+
+&lt;p&gt;Here I’ll describe the theoretical background of this image manipulation, but you can find scripts that deals with it in my Github repository: &lt;code class=&quot;highlighter-rouge&quot;&gt;https://github.com/NicoleEic/projects/tree/master/neuro_scripts/manual_rigid_body&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;lets-get-started-with-some-basics-&quot;&gt;Let’s get started with some basics …&lt;/h3&gt;
+
+&lt;p&gt;The type of transformation that I’m talking about is a ‘rigid body’ transformation. This means that the image can be translated (i.e. shifted) along the dimensions in space or rotated along the three spatial axes, but it won’t be deformed in any way. The image below demonstrates how translation and rotation would look like in a 2D example. Such a rigid body transformation has 6 degrees of freedom (3 for translation, 3 for rotation). Note that a transformation with 12 degrees of freedom would allow you to scale and shear the image, and a nonlinear transformation will yield more complex deformations.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/spin1.png&quot; alt=&quot;'Translation and Rotation'&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Both the translation and the rotation operation can be represented as 4x4 matrix (&lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;R&lt;/code&gt;). Below with the code snippets, I provide a bit more mathematical background of how we can derive these matrices. When we combine translation and rotation into one matrix, we get an ‘affine’ matrix &lt;code class=&quot;highlighter-rouge&quot;&gt;M&lt;/code&gt;: &lt;code class=&quot;highlighter-rouge&quot;&gt;M = T * R&lt;/code&gt;. Note that the order of the steps matters: &lt;code class=&quot;highlighter-rouge&quot;&gt;T * R != R * T&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;translation matrix (T) : | 1, 0, 0, t_1 |
+                         | 0, 1, 0, t_2 |
+                         | 0, 0, 1, t_3 |
+                         | 0, 0, 0, 1 |
+
+rotation matrix (R): | r_11 r_21 r_31 0 |
+                     | r_12 r_22 r_32 0 |
+                     | r_13 r_23 r_33 0 |
+                     | 0    0    0    1 |
+
+affine matrix (M): | m_11 m_21 m_31 m_41 |
+                   | m_12 m_22 m_32 m_42 |
+                   | m_13 m_23 m_33 m_43 |
+                   | 0    0    0    1    |                     
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;A structural brain scan is essentially a 3D matrix that stores the image intensities, let’s call it &lt;code class=&quot;highlighter-rouge&quot;&gt;I&lt;/code&gt;. Applying a transformation means that we are performing a matrix multiplication of the image matrix &lt;code class=&quot;highlighter-rouge&quot;&gt;I&lt;/code&gt; and the transformation matrix &lt;code class=&quot;highlighter-rouge&quot;&gt;M&lt;/code&gt; where the transformed output image is &lt;code class=&quot;highlighter-rouge&quot;&gt;I'&lt;/code&gt;: &lt;code class=&quot;highlighter-rouge&quot;&gt;I' = I * M&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;To get the rotation matrix, however, we have to wrap our head around a tricky topic, the coordinate system of the image. Typically, neuroimaging data comes with two coordinate systems that define ‘voxel space’ and ‘image space’. The origin of the voxel space is usually in the ‘left-posterior-inferior’ corner of your image. In image space, the origin is usually placed in the center of the brain. In FSL’s image viewer fsl_eyes, the coordinate for both spaces are displayed.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/spin2.png&quot; alt=&quot;'Coordinate systems'&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;A matrix multiplication as defined above, performed for example by FSL’s ‘applywarp’, will assume that we are rotating around the origin of the voxel space, which is NOT what we want in image alignment. That’s why we first need to compensate for the ‘offset’ between the two coordinate systems. The information about this ‘offset’ is stored in the header of your scan within the ‘sform’ (or ‘qform’). The sform is an affine matrix, where the offset is represented in the last column (I recommend reading: &lt;code class=&quot;highlighter-rouge&quot;&gt;https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Orientation%20Explained&lt;/code&gt;).&lt;/p&gt;
+
+&lt;p&gt;That means we require 3 steps to rotate the brain image: 1) translate the image to the voxel space origin using the offset from sform, 2) apply a rotation based on desired angles, 3) translate the image back to the image space origin using the inverse of the offset.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/spin3.png&quot; alt=&quot;'Rotation matrix'&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Equipped with this theoretical knowledge, we can compose our desired rigid body transformation using a few simple code lines. Working through such a transformation manually helped me a lot to understand how neuroimaging data is stored and displayed and how it can be manipulated outside of the standard processing toolboxes. I hope I could make this topic accessible without going too deep in the maths and below I post some related python snippets.&lt;/p&gt;
+
+&lt;p&gt;Thank you for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;
+
+&lt;h1 id=&quot;code-snippets-and-more-details&quot;&gt;Code snippets and more details&lt;/h1&gt;
+
+&lt;p&gt;The following website provides useful comments on translation and rotation: &lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.learnopencv.com/rotation-matrix-to-euler-angles/. &lt;/code&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;translation-matrix&quot;&gt;Translation matrix&lt;/h4&gt;
+&lt;p&gt;A translation can be represented as 3x1 vector or as 4x4 matrix. The conversion is straight forward:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# vector to matrix:
+translation_vec = np.array([x, y, z])
+T = np.array([[1, 0, 0, translation_vec[0]],
+              [0, 1, 0, translation_vec[1]],
+              [0, 0, 1, translation_vec[2]],
+              [0, 0, 0, 1]])
+
+# matrix to vector:
+translation_vec = T[0:3,3]
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;rotation-matrix&quot;&gt;Rotation matrix&lt;/h4&gt;
+&lt;p&gt;A rotation can be described as 3x1 vector (theta) for the rotation along the three spatial axes. Each of the three rotation components can be described by a rotation matrix. The combined rotation matrix is derived as matrix multiplication of the three matrices:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+# vector to matrix:
+
+# define rotation vector in radians
+theta = np.array([th1, th2, th3])
+
+R_x = np.array([[ 1, 0,                  0                   ],
+                [ 0, math.cos(theta[0]), -math.sin(theta[0]) ],
+                [ 0, math.sin(theta[0]),  math.cos(theta[0]) ]])
+
+R_y = np.array([[  math.cos(theta[1]), 0, math.sin(theta[1])],
+                [  0,                  1,                  0],
+                [ -math.sin(theta[1]), 0, math.cos(theta[1])]])
+
+R_z = np.array([[ math.cos(theta[2]), -math.sin(theta[2]), 0],
+                [ math.sin(theta[2]),  math.cos(theta[2]), 0],
+                [ 0,               0,                      1]])
+
+R = np.dot(R_z, np.dot( R_y, R_x ))
+
+# add fourth column and row to convert 3x3 to 4x4 matrix:
+R = np.vstack((R,[0,0,0]))
+R = np.hstack((R, np.array([0,0,0,1]).reshape(-1,1)))
+
+
+# matrix to vector:
+# will only work with an invertible matrix
+sy = math.sqrt(R[0,0] * R[0,0] + R[1,0] * R[1,0])
+is_singular = sy &amp;lt; 1e-4
+
+if not is_singular:
+    x = math.atan2(R[2,1], R[2,2])
+    y = math.atan2(-R[2,0], sy)
+    z = math.atan2(R[1,0], R[0,0])
+else:
+    x = math.atan2(-R[1,2], R[1,1])
+    y = math.atan2(-R[2,0], sy)
+    z = 0
+
+theta = np.array([x, y, z])
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;compensate-for-offset&quot;&gt;Compensate for offset&lt;/h4&gt;
+
+&lt;p&gt;The following lines create a rotation matrix with adjusting for the offset of the coordinate system as described above:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import nibabel as nib
+import numpy as np
+
+# define desired rotation vector
+theta = np.array([th1, th2, th3])
+
+# load input image
+img = nib.load(filename)
+
+# determine sform
+aff = img.get_affine()
+
+# get offset from last column
+offset = aff[0:3,3]
+
+# convert theta to matrix (see above)
+R = angles_to_rotation_matrix(theta)
+
+# convert offset to matrix (see above)
+T = vector_to_translation_matrix(offset)
+
+# concatenate translation, rotation and inverse translation:
+M = np.dot(np.linalg.inv(T), np.dot(R,T))
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;adjust-signs-in-offset&quot;&gt;Adjust signs in offset&lt;/h4&gt;
+&lt;p&gt;One last note on the offset of the coordinate system: Depending on the scanner settings the origin of your voxel space might be in a different ‘corner’ than the default (left-posterior-inferior). You can find out if this is the case by moving your cursor along the three spatial axis in your image viewer. You need to observe, if the values for the ‘voxel coordinates’ increase as expected from left to right, from posterior to anterior and from inferior to superior (sometimes called the default RAS+ orientation). If the values decrease instead, you can flip the sign using the following lines:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;flip_coordinates = [True False False]
+offset[flip_coordinates] = -offset[flip_coordinates]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Otherwise, the &lt;code class=&quot;highlighter-rouge&quot;&gt;nibabel&lt;/code&gt; library has some useful tools like &lt;code class=&quot;highlighter-rouge&quot;&gt;nib.aff2axcodes&lt;/code&gt; to automatically detect the axis orientations.&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Jenkinson, M., Beckmann, C. F., Behrens, T. E. J., Woolrich, M. W. &amp;amp; Smith, S. M. FSL. NeuroImage 62, 782–790 (2012).&lt;/p&gt;</content><author><name></name></author><summary type="html">Many processing steps in the analysis of brain scans rely on an accurate alignment of images. For example, when I transform my results to a standard reference space or when I align a subject’s brain scans from multiple sessions or scanning modalities. Tools such as FSL’s1 FLIRT automatically estimate a transformation that can map an input image to a reference. However, if my data is non-typical - for example from a different species or from neurological patients with brain lesions - I might not be satisfied with the result of the automatic estimation. But there is a solution: Thanks to linear algebra, we can manually adjust a transformation!</summary></entry><entry><title type="html">Some bits about BIDS - the Brain Imaging Data Structure format</title><link href="/2019/08/07/some-bits-about-bids.html" rel="alternate" type="text/html" title="Some bits about BIDS  - the Brain Imaging Data Structure format" /><published>2019-08-07T00:00:00-04:00</published><updated>2019-08-07T00:00:00-04:00</updated><id>/2019/08/07/some-bits-about-bids</id><content type="html" xml:base="/2019/08/07/some-bits-about-bids.html">&lt;p&gt;As a first blog entry I would like to talk about something which sits directly on the interface between the two themes of my blog - Brain and Code - , namely the way you organize your neuroimaging and behavioural data. The Brain Imaging Data Structure format (BIDS&lt;sup&gt;1&lt;/sup&gt;, https://bids.neuroimaging.io) provides conventions about structuring and naming your raw data files, which is incredibly useful for sharing data both within teams and the global research community. But also, and this is why I chose to write about BIDS, it helped me to write much more structured, and reusable code.&lt;/p&gt;
+
+&lt;p&gt;The concept of structuring your dataset in a hierarchical format is intuitive to anyone, but the BIDS specification ensures that your naming conventions are coherent and comprehendible (even when you look at your data in a few years time). More importantly, an increasing number of software packages will understand your folder structure, so that you can directly plug your data into a existing analysis pipeline or data validation tools.&lt;/p&gt;
+
+&lt;h1 id=&quot;the-basic-folder-structure&quot;&gt;The basic folder structure&lt;/h1&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;my_study_dataset
+ |
+ +-- sub-01
+ |  |  
+ |  +-- anat
+ |  |   |
+ |  |   \--sub-01_T1w.nii
+ |  |   \--sub-01_T1w.json
+ |  |
+ |  +-- func
+ |      |
+ |      \--sub-01_task-localizer_bold.nii
+ |      \--sub-01_task-localizer_bold.json
+ |      \--sub-01_task-localizer_bold_events.tsv
+ |
+ +-- sub-02
+ |    
+ +-- sub-03
+ |
+ +-- derivatives
+ |   |
+ |   +-- sub-01
+ |   |   |
+ |   |   + -- anat
+ |   |   |
+ |   |   + -- func
+ |   |
+ |   +-- sub-02
+ |   |    
+ |   +-- sub-03
+ |   |
+ |   +-- group
+ |   |   |
+ |   |   + -- anat
+ |   |   |
+ |   |   + -- func
+ |
+ +-- participants.tsv
+ |
+ +-- code   
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the example above you can see a simple tree structure for a study, where one structural scan and one functional localizer task scan was obtained in three subjects. In fact, the BIDS format can accommodate much more complex study designs with multiple sessions, different scanning modalities and different groups of subjects, but the logic always stays the same.&lt;/p&gt;
+
+&lt;p&gt;The study root directory (my_study_dataset) is on top of the hierarchy and each subject’s raw data is stored in the level below. Note that each nifti-file is stored with its json-file, which should be retained from the dicom conversion. All derived data is stored within an extra subfolder. This separation ensures that you touch your raw data as little as possible to prevent painful accidents. BIDS does not prescribe specifications for your derived data, but I chose to maintain the same structure for different modalities (anat, func). In addition, I’m using a ‘derived/group’ subfolder, where I store group-level or average results, which is mirroring the subject-level folder structure and file names.&lt;/p&gt;
+
+&lt;p&gt;The participants.tsv file in our case might look like this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id	age	sex	handedness	comments
+01	34	w	rh	no comments
+02	24	m	lh	no comments
+03	30	m	rh	no comments
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;You can store as many columns as you want and update the overview file during data acquisition. It can be very useful to read in this file in your analysis scripts.&lt;/p&gt;
+
+&lt;p&gt;BIDS doesn’t provide recommendations for the organization of your /code/ subfolder, but I found it helpful to use the modality names as prefixes for filenames. For example, I have files called anat_segmentation.sh, func_preprocess.sh, etc.&lt;/p&gt;
+
+&lt;h1 id=&quot;code-snippets&quot;&gt;Code snippets&lt;/h1&gt;
+&lt;p&gt;Below I’m sharing some snippets of code with you, where I’m making use of the BIDS conventions. They helped me to optimize my workflow and might give you some inspiration.&lt;/p&gt;
+
+&lt;h4 id=&quot;basic-variable-names&quot;&gt;Basic variable names&lt;/h4&gt;
+
+&lt;p&gt;Most of my shell script start with the following lines, which define the core variable names:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rootdir=/mypath/my_study_dataset
+
+# obtain the subject-id as input to function, or define via loop, etc.
+subj=$1
+
+# data directory where raw data is stored
+DD=$rootdir/sub-$subj
+
+# output directory, where derived data is stored
+OD=$rootdir/derivatives/sub-$subj
+
+# group-level output directory
+GD=$rootdir/derivatives/group
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;copy-raw-data&quot;&gt;Copy raw data&lt;/h4&gt;
+
+&lt;p&gt;I’d recommend keeping a script to monitor how you copy your raw data from the scanner or server, because
+it decreases the chance to mix up subjects’ data - a severe problem, which will be very difficult to detect later. This is how I copied my files form a server, where dicom images had been automatically converted to nifti-format:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# my subject-id definition for this participant
+subj=01
+
+# subject-id assigned by scan operator
+scan_id=030
+
+rootdir=/mypath/my_study_dataset
+DD=$rootdir/sub-$subj
+OD=$rootdir/derivatives/sub-$subj
+
+# prepare BIDS data folders for this subject
+mkdir -p $DD/anat
+mkdir $DD/func
+mkdir -p $OD/anat
+mkdir $OD/func
+
+# copy the whole folder containing this subject's raw data
+cp -r /serer_path/data_${scan_id} $DD/
+
+# the filenames that are assigned at the scanner are highly study-specific
+# anat
+mv $DD/data_${scan_id}/*_t1_mpr*.json $DD/anat/sub-${subj}_T1w.json
+mv $DD/data_${scan_id}/*_t1_mpr*.nii $DD/anat/sub-${subj}_T1w.nii
+
+# func
+mv $DD/data_${scan_id}/*_BOLD_*.json $DD/func/sub-${subj}_task-localizer_bold.json
+mv $DD/data_${scan_id}/*_BOLD_*.nii $DD/func/sub-${subj}_task-localizer_bold.nii
+
+# finally, the following line should be executed without error when all files have been copied successfully and the folder is empty:
+rmdir $DD/data_${scan_id}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;loop-over-participants&quot;&gt;Loop over participants&lt;/h4&gt;
+
+&lt;p&gt;In the following snippet I make use of the participants.tsv file at the top of a python script:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import pandas as pd
+import os
+
+rootdir='/mypath/my_study_dataset'
+subs = pd.read_csv(os.path.join(rootdir, 'participants.tsv'), sep='\t', dtype={'id': str})
+# exclude a subject
+subs = subs[~subs['id'].isin(['03'])]
+
+# loop over subjects
+for ind, sub_row in subs.iterrows():
+    OD = os.path.join(myscratch, 'LarynxRepresentation', 'derivatives', 'sub-' + sub_row.id)
+    # do something.....
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h4 id=&quot;convert-feat-timing-files&quot;&gt;Convert FEAT timing files&lt;/h4&gt;
+
+&lt;p&gt;I use FSL’s&lt;sup&gt;2&lt;/sup&gt; FEAT to analyse task fMRI data. The timing information about the GLM for FEAT is stored in form of one separate txt for each EV (or regressor). I wrote a script that converts these timing files to a single .tsv file, which can be stored as &lt;code class=&quot;highlighter-rouge&quot;&gt;*_events.tsv&lt;/code&gt; file with the raw task data.
+The whole script can be found in my Github repository at &lt;code class=&quot;highlighter-rouge&quot;&gt;https://github.com/NicoleEic/projects/blob/master/neuro_scripts/convert_timing_files/convert_timing_files.py&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;thats-it&quot;&gt;That’s it!&lt;/h1&gt;
+
+&lt;p&gt;I hope I could encourage you to make use of the BIDS format in your work! More information can be on the official website &lt;code class=&quot;highlighter-rouge&quot;&gt;https://bids.neuroimaging.io&lt;/code&gt;. Thanks for reading this post :-)&lt;/p&gt;
+
+&lt;p&gt;Nicole&lt;/p&gt;
+
+&lt;h3 id=&quot;references&quot;&gt;References&lt;/h3&gt;
+&lt;p&gt;&lt;sup&gt;1&lt;/sup&gt; Gorgolewski, K. J. et al. The brain imaging data structure, a format for organizing and describing outputs of neuroimaging experiments. Scientific Data 3, 1–9 (2016).&lt;/p&gt;
+
+&lt;p&gt;&lt;sup&gt;2&lt;/sup&gt; Jenkinson, M., Beckmann, C. F., Behrens, T. E. J., Woolrich, M. W. &amp;amp; Smith, S. M. FSL. NeuroImage 62, 782–790 (2012).&lt;/p&gt;</content><author><name></name></author><summary type="html">As a first blog entry I would like to talk about something which sits directly on the interface between the two themes of my blog - Brain and Code - , namely the way you organize your neuroimaging and behavioural data. The Brain Imaging Data Structure format (BIDS1, https://bids.neuroimaging.io) provides conventions about structuring and naming your raw data files, which is incredibly useful for sharing data both within teams and the global research community. But also, and this is why I chose to write about BIDS, it helped me to write much more structured, and reusable code.</summary></entry><entry><title type="html">Let’s start to use Jekyll</title><link href="/2019/08/06/lets-start-jekyll.html" rel="alternate" type="text/html" title="Let's start to use Jekyll" /><published>2019-08-06T00:00:00-04:00</published><updated>2019-08-06T00:00:00-04:00</updated><id>/2019/08/06/lets-start-jekyll</id><content type="html" xml:base="/2019/08/06/lets-start-jekyll.html">&lt;p&gt;Ok… you might have figured out that this post was actually created automatically when I first initialized the repository. But in the end I would like to keep it to remind myself and you how to use Jekyll as a site generator and GitHub Pages to host the page.&lt;/p&gt;
+
+&lt;p&gt;I found some useful info to get started with Jekyll at the following links:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://jekyllrb.com/docs/home
+https://github.com/jekyll/jekyll
+https://talk.jekyllrb.com/
+https://onextrapixel.com/start-jekyll-blog-github-pages-free/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For a Quick-start type the following in your computer terminal:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install bundler jekyll
+jekyll new Brain_and_Code
+cd Brain_and_Code
+bundle exec jekyll serve
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The site is generated locally and you can access it in your browser by navigating to:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://localhost:4000
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;I wanted the blog to be connected to my already existing GitHub projects, so for me, Google Pages seemed to be the perfect solution. I followed the instruction on GitHub to integrate my blog with my repository:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://help.github.com/en/articles/configuring-a-publishing-source-for-github-pages
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;So this enables me to work on my projects and my blog at the same repository but under separate branches.&lt;/p&gt;</content><author><name></name></author><summary type="html">Ok… you might have figured out that this post was actually created automatically when I first initialized the repository. But in the end I would like to keep it to remind myself and you how to use Jekyll as a site generator and GitHub Pages to host the page.</summary></entry></feed>

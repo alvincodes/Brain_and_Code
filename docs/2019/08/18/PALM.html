@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Three examples of PALM: Permutation Analysis of Linear Models | Brain_and_Code</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Three examples of PALM: Permutation Analysis of Linear Models" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) p-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a t-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing." />
+<meta property="og:description" content="Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) p-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a t-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing." />
+<link rel="canonical" href="/2019/08/18/PALM.html" />
+<meta property="og:url" content="/2019/08/18/PALM.html" />
+<meta property="og:site_name" content="Brain_and_Code" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-08-18T00:00:00-04:00" />
+<script type="application/ld+json">
+{"mainEntityOfPage":{"@type":"WebPage","@id":"/2019/08/18/PALM.html"},"url":"/2019/08/18/PALM.html","headline":"Three examples of PALM: Permutation Analysis of Linear Models","dateModified":"2019-08-18T00:00:00-04:00","datePublished":"2019-08-18T00:00:00-04:00","description":"Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) p-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a t-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing.","@type":"BlogPosting","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="/feed.xml" title="Brain_and_Code" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Brain_and_Code</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Three examples of PALM: Permutation Analysis of Linear Models</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-08-18T00:00:00-04:00" itemprop="datePublished">Aug 18, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Sooner or later we want to deduce properties of our data using statistical inference to derive parameter estimates or to find the (often condemned) <i>p</i>-value of our effect. For both behavioural and neuroimaging, however, we might find that the data doesn’t meet the criteria for parametric tests, such as a <i>t</i>-test or ANOVA. There are a range of alternative non-parametric tests available (Mann-Whitney U test, Friedman test, etc.) and one widely-used approach is permutation testing.</p>
+
+<p>A great tool to perform permutation tests is PALM (<b>P</b>ermutation <b>A</b>nalysis of <b>L</b>inear <b>M</b>odels<sup>1</sup>, https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/PALM). One of the advantages of PALM is the flexibility of input data, because it can work with both volumetric and surface neuroimaging data. Another key feature is that you have strong control over the shuffling strategies even for complex designs. Furthermore, PALM corrects for for multiple testing over multiple contrasts or modalities. In general, the statistics are handled very carefully in PALM allowing you to specify a great range of options, which are detailed in the User Guide.</p>
+
+<p>Below, I will talk you through three examples of how PALM can be used with different study designs and different input data.</p>
+
+<h2 id="example-1-simple-t-test-with-input-data-1d-vector">Example 1) Simple <i>t</i>-test (with input data: 1D vector)</h2>
+<p>Let’s consider the situation where you compare a single measurement in 6 control subjects and 6 patients. Our input data is a vector with 12 elements, combining the data of both groups. We store the vector as column in the file ‘my_input.csv’.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>7.05
+4.44
+5.32
+etc...
+</code></pre></div></div>
+<p>For the design, we construct a linear model consisting of a single explanatory variable (EV) for the factor group, i.e. -1 for control and 1 for patient. In addition, we include a constant EV to model the grand mean. The design is stored in the file ‘my_design.csv’. Here, I won’t go into the background of how to build a general linear model (GLM), but the following website contains very useful help on this topic: https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/GLM.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># build the design in python:
+n_subs = 6
+n_groups = 2
+ev_group = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+grand_mean = np.ones(n_subs * n_groups).reshape(-1,1)
+my_design = np.hstack((ev_group, grand_mean))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=",")
+
+# the design file will look like this:
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+-1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+1, 1
+</code></pre></div></div>
+
+<p>Because we are running a two-tailed <i>t</i>-test, we need only one row for the contrast of interest, which is stored in ‘my_contrast.csv’.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1, 0
+</code></pre></div></div>
+
+<p>PALM can be called from the command line using the following settings:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$path_to_palm/palm -i my_input.csv -d my_design.csv -t my_contrast.csv -o my_output -n 5000 -twotail
+</code></pre></div></div>
+
+<p>Our output files are the following:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my_output_dat_tstat.csv
+my_output_dat_tstat_fwep.csv
+my_output_dat_tstat_uncp.csv
+my_output_elapsed.csv
+my_output_palmconfig.txt
+</code></pre></div></div>
+
+<p>The t-statistic is stored in <code class="highlighter-rouge">my_output_dat_tstat.csv</code> and the associated <i>p</i>-value in <code class="highlighter-rouge">my_output_dat_tstat_uncp.csv</code>. Family-wise error correction does not have an effect in this case, so the file <code class="highlighter-rouge">my_output_dat_tstat_fwep.csv</code> will be identical.</p>
+
+<h2 id="example-2-2-x-3-factorial-design-with-input-data-volumetric-imaging-files">Example 2) 2 x 3 Factorial design (with input data: volumetric imaging files)</h2>
+<p>In the following example, we’re considering the situation, where we have an additional factor in the design, for example an experimental condition where the subjects received a drug: two of the six control subjects received placebo, two received drug1 and two drug2 and the same for the patient group ( - this is just an illustrative example, a sample size of 2 would be ridiculous for a drug study!). In those 12 subjects, we acquired an anatomical brain scan and we are interested to see if and where the brains of patients are different and if the drugs have an effect on the brain and on the difference in patients. Statistically speaking, we are looking at the voxel-wise main effect of factor ‘group’ (which has two factors: control and patient), the main effect of factor ‘condition’ (which has three factors: placebo, drug1, drug2) and the interaction effect of ‘group’ and ‘condition’.</p>
+
+<p>I assume that the brain scans have been registered to MNI space and they are stored according to BIDS format in $my_study_dataset/derivatives/sub-control01/MNINonLinear/sub-control01_T1w.nii.gz and $my_study_dataset/derivatives/sub-patient01/MNINonLinear/sub-patient01_T1w.nii.gz (and so on for the other subjects). To make the scans suitable as input for PALM, we have to merge them into a single 4-dimensional file. Here, I use FSL<sup>2</sup> tools to manipulate the files:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># initialize file of merged volumes with one dummy volume, which will be removed later
+imcp $my_study_dataset/derivatives/sub-control01/MNINonLinear/sub-control01_T1w.nii.gz my_input.nii.gz
+
+# loop over control subjects and patients
+for group in control patient; do
+    for sub in 01 02 03 04 05 06; do
+        fslmerge -t my_input.nii.gz$merged_files $my_study_dataset/derivatives/sub-${group}${sub}/MNINonLinear/sub-${group}${sub}_T1w.nii.gz
+    done
+done
+
+# remove first dummy volume
+pdim=$(fslval my_input.nii.gz "dim4")
+fslroi my_input.nii.gz my_input.nii.gz 1 $(( $pdim - 1))
+</code></pre></div></div>
+
+<p>The design file ‘my_design.csv’ will start with one EV for the ‘group’ factor (column 1) like above for the <i>t</i>-test. The next two EVs model the main effect of the factor ‘condition’. The interaction effect is modelled by two EVs (column 4 and 5) and the last column models the grand mean:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># build the design in python:
+n_subs = 6
+n_groups = 2
+n_subs_in_con = 2
+ev_group = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+ev_condition_1 = np.tile(np.array([-1,0,1)].repeat(n_subs_in_con),n_groups).reshape(-1,1)
+ev_condition_2 = np.tile(np.array([-1,1,0]).repeat(n_subs_in_con),n_groups).reshape(-1,1)
+ev_interaction_1 = ev_group * ev_condition_1
+ev_interaction_2 = ev_group * ev_condition_2
+grand_mean = np.ones(n_subs * n_groups).reshape(-1,1)
+my_design = np.hstack((ev_group, ev_condition_1, ev_condition_2, ev_interaction_1, ev_interaction_2, grand_mean))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=",")
+
+# the resulting design file will look like this:
+-1, -1, -1, 1, 1, 1
+-1, -1, -1, 1, 1, 1
+-1, 0, 1, 0, -1, 1
+-1, 0, 1, 0, -1, 1
+-1, 1, 0, -1, 0, 1
+-1, 1, 0, -1, 0, 1
+1, -1, -1, -1, -1, 1
+1, -1, -1, -1, -1, 1
+1, 0, 1, 0, 1, 1
+1, 0, 1, 0, 1, 1
+1, 1, 0, 1, 0, 1
+1, 1, 0, 1, 0, 1
+</code></pre></div></div>
+
+<p>The contrast file ‘my_contrast.csv’ contains one row each to code for each of the EVs we defined for the two main effects and the interaction effects:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1, 0, 0, 0, 0, 0
+0, 1, 0, 0, 0, 0
+0, 0, 1, 0, 0, 0
+0, 0, 0, 1, 0, 0
+0, 0, 0, 0, 1, 0
+</code></pre></div></div>
+
+<p>As the factor ‘condition’ has multiple levels, we want to derive the <i>F</i>-statistic associated with the two contrasts for this factor and the two contrasts for the interaction effect. We model this in the file ‘my_f_tests.csv’, which contains one row to code for the two condition EVs and one row to code for the two interaction contrasts. Note that PALM doesn’t perform rank-1 <i>F</i>-tests, which would be associated with the main effect of ‘group’, because the factor only has two levels.</p>
+
+<p>This is how the <i>F</i>-contrast file will look like:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0, 1, 1, 0, 0
+0, 0, 0, 1, 1
+</code></pre></div></div>
+
+<p>The PALM-call looks similar as above, but it includes the -f option to perform the <i>F</i>-tests. We also include the <code class="highlighter-rouge">-noniiclass</code> option, because we are using a gzipped nifti image as input:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$path_to_palm/palm -i my_input.nii.gz -d my_design.csv -t my_contrast.csv -f my_f_tests.csv -o my_output -n 5000 -twotail -noniiclass
+</code></pre></div></div>
+
+<p>As output we get the following files:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my_output_vox_fstat_c6.nii.gz
+my_output_vox_fstat_c7.nii.gz
+my_output_vox_fstat_fwep_c6.nii.gz
+my_output_vox_fstat_fwep_c7.nii.gz
+my_output_vox_fstat_uncp_c6.nii.gz
+my_output_vox_fstat_uncp_c7.nii.gz
+my_output_vox_tstat_c1.nii.gz
+my_output_vox_tstat_c2.nii.gz
+my_output_vox_tstat_c3.nii.gz
+my_output_vox_tstat_c4.nii.gz
+my_output_vox_tstat_c5.nii.gz
+my_output_vox_tstat_fwep_c1.nii.gz
+my_output_vox_tstat_fwep_c2.nii.gz
+my_output_vox_tstat_fwep_c3.nii.gz
+my_output_vox_tstat_fwep_c4.nii.gz
+my_output_vox_tstat_fwep_c5.nii.gz
+my_output_vox_tstat_uncp_c1.nii.gz
+my_output_vox_tstat_uncp_c2.nii.gz
+my_output_vox_tstat_uncp_c3.nii.gz
+my_output_vox_tstat_uncp_c4.nii.gz
+my_output_vox_tstat_uncp_c5.nii.gz
+</code></pre></div></div>
+
+<p>As you can see, we get niftis image that store voxel-wise t-statistics and <i>p</i>-values for each <i>t</i>-test specified in the contrast file (c1 - c5). The corrected <i>p</i>-value associated with the main effect of ‘group’ is stored in <code class="highlighter-rouge">my_output_vox_tstat_fwep_c1.nii.gz</code>. For the <i>F</i>-tests (c6, c7), the <i>F</i>-statistic and the associated <i>p</i>-values are reported. The <i>p</i>-values for the main effect of ‘condition’ are stored in <code class="highlighter-rouge">my_output_vox_fstat_fwep_c6.nii.gz</code> and for the interaction effect in <code class="highlighter-rouge">my_output_vox_fstat_fwep_c7.nii.gz</code>.</p>
+
+<h2 id="example-3-hemispheric-differences-with-input-data-metric-surface-files">Example 3) Hemispheric differences (with input data: metric surface files)</h2>
+<p>For the last example, let’s assume a design, where we want to test if and where a specific resting-state network is different across the two hemispheres. We acquired data in 5 subjects and derived one metric file for each hemisphere. As the data from both hemispheres comes from the same subjects, it’s a repeated measures design. That’s why we model the random effect associated with each subject as additional column for each subject and we don’t need to model the grand mean anymore.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># build the design in python:
+n_subs = 5
+ev_hemisphere = np.array([-1,1]).repeat(n_subs).reshape(-1,1)
+random_effects = np.identity(n_subs)
+my_design = np.hstack((ev_hemisphere, np.vstack((random_effects, random_effects))))
+np.savetxt('my_design.csv', my_design, fmt='%1.0f', delimiter=",")
+
+# the design file will look like this:
+-1, 1, 0, 0, 0, 0
+-1, 0, 1, 0, 0, 0
+-1, 0, 0, 1, 0, 0
+-1, 0, 0, 0, 1, 0
+-1, 0, 0, 0, 0, 1
+1, 1, 0, 0, 0, 0
+1, 0, 1, 0, 0, 0
+1, 0, 0, 1, 0, 0
+1, 0, 0, 0, 1, 0
+1, 0, 0, 0, 0, 1
+</code></pre></div></div>
+
+<p>For the contrast file, we are only interested in the first EV.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1, 0, 0, 0, 0, 0
+</code></pre></div></div>
+
+<p>In order to make the metric surface data suitable for PALM as input, we have to concatenate the files, similar as above for the volumetric example. Here, I’m using Connectome Workbench<sup>3</sup> commands to manipulate the files. I’m assuming that the metric surface data has been resampled to the standard 32k_fs_LR surface mesh and an example filename would be <code class="highlighter-rouge">sub-01.L.restingstate.32k_fs_LR.func.gii</code>.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># compose a string to pass as input to the workbench merging function
+command_str=""
+
+# loop over hemisphere and subjects
+for hemi in L R ; do
+    for sub in 01 02 03 04 05; do
+        subject_file=$my_study_dataset/derivatives/sub-$sub/MNINonLinear/fsaverage_LR32k/sub-${sub}.${hemi}.corrThickness.32k_fs_LR.func.gii
+
+        # flip data on the right hemisphere to the left to allow them to be concatenated
+        if [[ $hemi == 'R' ]] ; then
+            wb_command -set-structure $subject_file CORTEX_LEFT
+        fi    
+
+        # append the command string
+        command_str="$command_str -metric $subject_file"
+    done
+done
+
+# pass command string to the workbench function
+wb_command -metric-merge my_input.func.gii $command_str
+</code></pre></div></div>
+
+<p>Having these files we can call PALM using the following command:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$path_to_palm/palm -i my_input.func.gii -d my_design.csv -t my_contrast.csv -o my_output -n 5000 -twotail
+</code></pre></div></div>
+
+<p>The PALM-call will produce the following output files:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>my_output_dpv_tstat.func.gii
+my_output_dpv_tstat_fwep.gii
+my_output_dpv_tstat_uncp.gii
+</code></pre></div></div>
+<p>For the <i>p</i>-values associated with the effect of hemisphere, the file of interest is <code class="highlighter-rouge">my_output_dpv_tstat_uncp.gii</code>. In order to display the result onto a surface mesh, the file-extension needs to be changed (renamed) to <code class="highlighter-rouge">my_output_dpv_tstat_uncp.func.gii</code>.</p>
+
+<h1 id="thats-it">That’s it!</h1>
+<p>In this post I described three simple examples of how PALM can be used, but there are many (!) more options available, so check out the PALM UserGuide to see which settings you might need. Also, I didn’t to go into depth about the GLM design, but there are many other excellent resources online.</p>
+
+<p>Thanks for reading this post :-)</p>
+
+<p>Nicole</p>
+
+<h3 id="references">References</h3>
+<p><sup>1</sup> Winkler, A. M., Ridgway, G. R., Webster, M. A., Smith, S. M. &amp; Nichols, T. E. Permutation inference for the general linear model. NeuroImage 92, 381–397 (2014).</p>
+
+<p><sup>2</sup> Jenkinson, M., Beckmann, C. F., Behrens, T. E. J., Woolrich, M. W. &amp; Smith, S. M. FSL. NeuroImage 62, 782–790 (2012).</p>
+
+<p><sup>3</sup> https://www.humanconnectome.org/software/connectome-workbench</p>
+
+  </div><a class="u-url" href="/2019/08/18/PALM.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Brain_and_Code</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Brain_and_Code</li><li><a class="u-email" href="mailto:n.eichert@googlemail.com">n.eichert@googlemail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/nicoleeic"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">nicoleeic</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Hi! Read this blog if you want to know my tips about data visualization and data analysis for neuroimaging and behavioural data. You will also find some tutorials and code snippets to improve you workflow in Python, bash, R and matlab coding.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
